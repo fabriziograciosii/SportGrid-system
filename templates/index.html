@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva tu Cancha | SPORTGRID</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #00a45b;
+            text-decoration: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #495057;
+            margin-left: 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .nav-links a.btn-login {
+            background: #00a45b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #00a45b 0%, #007a43 100%);
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .search-box {
+            background: white;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+        .search-field {
+            text-align: left;
+        }
+        .search-field label {
+            display: block;
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .search-field select, .search-field input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .btn-buscar {
+            background: #00a45b;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .grilla-canchas {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .cancha-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid #00a45b;
+        }
+        .cancha-titulo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .cancha-desc {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        .btn-reservar {
+            display: inline-block;
+            background: #e6f4ed;
+            color: #00a45b;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* NUEVO: Estilos para la botonera de turnos */
+        .horarios-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .btn-turno {
+            background: white;
+            border: 1px solid #00a45b;
+            color: #00a45b;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-turno:hover {
+            background: #00a45b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="#" class="logo">SPORTGRID </a>
+        <div class="nav-links">
+            <a href="#">Registrar Club</a>
+            <a href="#" class="btn-login">Ingresar</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Encontrá y reservá tu cancha al instante</h1>
+        <p>La red más grande de complejos deportivos en un solo lugar.</p>
+        
+        <div class="search-box">
+            <div class="search-field">
+                <label>Deporte</label>
+                <select id="filtro-deporte">
+                    <option value="1">Pádel</option>
+                    <option value="2">Fútbol 5</option>
+                </select>
+            </div>
+            <div class="search-field">
+                <label>Ciudad</label>
+                <select id="filtro-ciudad">
+                    <option value="corrientes">Corrientes</option>
+                    <option value="resistencia">Resistencia</option>
+                </select>
+            </div>
+            <div class="search-field">
+                <label>Fecha</label>
+                <input type="date" id="filtro-fecha">
+            </div>
+            <button class="btn-buscar">Buscar</button>
+        </div>
+    </section>
+
+    <main class="container">
+        <div class="section-title">Instalaciones Disponibles</div>
+        <div id="contenedor-canchas" class="grilla-canchas">
+            <p>Cargando disponibilidad...</p>
+        </div>
+    </main>
+
+    <script>
+        async function cargarCanchas() {
+            try {
+                const respuesta = await fetch('/api/canchas');
+                const canchas = await respuesta.json();
+                
+                const contenedor = document.getElementById('contenedor-canchas');
+                contenedor.innerHTML = ''; 
+
+                canchas.forEach(cancha => {
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = 'cancha-card';
+                    
+                    // Al hacer clic, ahora llamamos a la función mostrarHorarios y le pasamos el ID de la cancha
+                    tarjeta.innerHTML = `
+                        <div class="cancha-titulo">${cancha.nombre_interno}</div>
+                        <div class="cancha-desc">${cancha.caracteristicas}</div>
+                        <button class="btn-reservar" onclick="mostrarHorarios(${cancha.id_instalacion})">Ver Horarios &rarr;</button>
+                        
+                        <!-- Acá adentro se van a dibujar los botones de las horas -->
+                        <div id="horarios-${cancha.id_instalacion}" class="horarios-container"></div>
+                    `;
+                    contenedor.appendChild(tarjeta);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // NUEVO: Función que va a buscar los turnos a la API cuando hacés clic
+        async function mostrarHorarios(idCancha) {
+            const contenedor = document.getElementById(`horarios-${idCancha}`);
+            
+            // Si los horarios ya están visibles y volvés a tocar el botón, los cerramos (efecto acordeón)
+            if (contenedor.innerHTML !== '') {
+                contenedor.innerHTML = '';
+                return;
+            }
+
+            contenedor.innerHTML = '<span style="font-size: 12px; color: gray;">Calculando turnos...</span>';
+
+            try {
+                const respuesta = await fetch(`/api/horarios/${idCancha}`);
+                const horarios = await respuesta.json();
+                
+                contenedor.innerHTML = ''; // Limpiamos el texto de carga
+
+                // Por cada hora, creamos un botoncito verde
+                horarios.forEach(hora => {
+                    const btnTurno = document.createElement('button');
+                    btnTurno.className = 'btn-turno';
+                    btnTurno.innerText = hora;
+                    // Cuando toquemos la hora, podríamos disparar la lógica de reserva final
+                    btnTurno.onclick = () => alert(`Iniciando reserva para las ${hora} en la cancha ID: ${idCancha}`);
+                    
+                    contenedor.appendChild(btnTurno);
+                });
+            } catch (error) {
+                contenedor.innerHTML = '<span style="color: red;">Error al cargar horarios.</span>';
+            }
+        }
+
+        // Arrancamos la aplicación
+        cargarCanchas();
+    </script>
+</body>
+</html>
