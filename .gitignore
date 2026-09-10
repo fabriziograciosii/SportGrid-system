@@ -1,0 +1,9 @@
+# Entorno virtual
+venv/
+
+# Basura de macOS
+.DS_Store
+
+# Caché de Python
+__pycache__/
+*.pyc
