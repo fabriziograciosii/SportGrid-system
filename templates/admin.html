@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control | SPORTGRID Clubes</title>
+    <!-- PWA & Mobile Web App -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#005aff">
+    <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+</head>
+<body>
+
+    <!-- 1. NAVBAR DEL PANEL -->
+    <header class="admin-navbar">
+        <a href="/admin" class="admin-logo">
+            <span class="logo-sport">SPORT</span><span class="logo-grid">GRID</span>
+            <span class="admin-badge">Panel Club</span>
+        </a>
+        <div class="admin-nav-links">
+            <div class="club-nombre-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span id="nav-club-display">{{ club.nombre_club | default('Punto Norte Sport Complex') }}{% if club.ciudad %} · {{ club.ciudad }}{% endif %}</span>
+            </div>
+            {% if admin_rol != 'recepcion' %}
+            <button type="button" onclick="abrirModalConfig()" class="btn-config-admin" style="background: white; border: 1.5px solid var(--border-color); padding: 7px 14px; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 800; color: var(--text-main); cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Configurar Complejo</span>
+            </button>
+            {% endif %}
+            <button type="button" onclick="abrirModalBannerQR()" class="btn-config-admin" style="background: white; border: 1.5px solid var(--border-color); padding: 7px 14px; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 800; color: var(--text-main); cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>Cartel QR Mostrador</span>
+            </button>
+            <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; background: var(--bg-card-alt); padding: 6px 12px; border-radius: var(--radius-full); border: 1px solid var(--border-color);">
+                {% if admin_rol == 'recepcion' %}🏢 Mostrador / Recepción{% else %}👑 Dueño / Admin{% endif %} ({{ session.get('admin_nombre', 'Admin').split()[0] }})
+            </span>
+            <a href="/" class="btn-volver-web">&larr; Ver como jugador</a>
+            <a href="/admin/logout" class="btn-logout-admin" title="Cerrar sesión de administrador">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span>Salir</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- 2. CONTENEDOR PRINCIPAL -->
+    <main class="admin-container">
+
+        <!-- BARRA DE PESTAÑAS DEL PANEL ADMIN -->
+        <div class="admin-nav-tabs">
+            <button type="button" class="admin-tab-btn active" id="tab-btn-agenda" onclick="cambiarPestanaAdmin('agenda')">
+                <span>📅 Agenda de Canchas</span>
+            </button>
+            <button type="button" class="admin-tab-btn" id="tab-btn-cantina" onclick="cambiarPestanaAdmin('cantina')">
+                <span>🍻 Cantina & Kiosco (POS)</span>
+            </button>
+            {% if admin_rol != 'recepcion' %}
+            <button type="button" class="admin-tab-btn" id="tab-btn-abonos" onclick="cambiarPestanaAdmin('abonos')">
+                <span>📋 Abonos Fijos Mensuales</span>
+            </button>
+            <button type="button" class="admin-tab-btn" id="tab-btn-caja" onclick="cambiarPestanaAdmin('caja')">
+                <span>💵 Arqueo de Caja Diario</span>
+            </button>
+            {% endif %}
+        </div>
+
+        <!-- ====================================================
+             PESTAÑA 1: AGENDA DIARIA DE TURNOS
+             ==================================================== -->
+        <div id="vista-agenda">
+            <!-- Barra de Control de Fecha y Botón de Acción -->
+            <section class="admin-control-bar">
+                <div class="date-navigator">
+                    <button class="btn-nav-fecha" onclick="cambiarDia(-1)" title="Día anterior">&larr;</button>
+                    <div class="fecha-display" id="admin-fecha-actual">Cargando fecha...</div>
+                    <button class="btn-nav-fecha" onclick="cambiarDia(1)" title="Día siguiente">&rarr;</button>
+                    <button class="btn-hoy" onclick="irAHoy()\">Hoy</button>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <button type="button" onclick="abrirModalCrearOferta()" class="btn-nueva-reserva" style="background: #e11d48; box-shadow: 0 4px 12px rgba(225,29,72,0.25);">
+                        <span>🔥 Publicar Último Minuto</span>
+                    </button>
+                    {% if admin_rol != 'recepcion' %}
+                    <button type="button" class="btn-export-csv" onclick="descargarReporteCSV()" title="Descargar planilla de turnos en Excel/CSV">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Exportar CSV</span>
+                    </button>
+                    {% endif %}
+                    <button class="btn-nueva-reserva" onclick="abrirModalManual()">
+                        <span>+ Nueva Reserva Manual</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Métricas Rápidas del Día -->
+            <section class="admin-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Turnos Reservados</div>
+                    <div class="stat-value" id="kpi-reservados">0</div>
+                    <div class="stat-desc" id="kpi-desc-totales">Cargando...</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Turnos Disponibles</div>
+                    <div class="stat-value" style="color: var(--primary);" id="kpi-libres">0</div>
+                    <div class="stat-desc">Listos para reservar</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ocupación del Día</div>
+                    <div class="stat-value" style="color: #0284c7;" id="kpi-ocupacion">0%</div>
+                    <div class="stat-desc">Demanda en tiempo real</div>
+                </div>
+                {% if admin_rol != 'recepcion' %}
+                <div class="stat-card">
+                    <div class="stat-label">Señas Recaudadas</div>
+                    <div class="stat-value" style="color: #16a34a;" id="kpi-senas">$0</div>
+                    <div class="stat-desc" id="kpi-desc-senas">Acreditadas vía Mercado Pago</div>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Grilla / Agenda Diaria de Turnos -->
+            <section class="grilla-agenda-card">
+                <table class="agenda-table">
+                    <thead>
+                        <tr id="fila-encabezado-canchas">
+                            <th style="width: 110px;">Horario</th>
+                            {% if canchas %}
+                                {% for c in canchas %}
+                                <th>{{ c.nombre_interno }} <span style="display:block; font-size: 0.72rem; font-weight: 600; color: var(--text-muted);">{{ c.nombre_deporte }}</span></th>
+                                {% endfor %}
+                            {% else %}
+                                <th>Cancha 1 (Pádel)</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo-agenda-admin">
+                        <tr><td colspan="5" style="text-align:center; padding:40px;">Cargando turnos del día...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+        <!-- ====================================================
+             PESTAÑA 2: CANTINA & KIOSCO (POS)
+             ==================================================== -->
+        <div id="vista-cantina" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 900; color: var(--text-main);">Punto de Venta · Cantina & Tercer Tiempo</h2>
+                    <p style="color: var(--text-muted); font-size: 0.88rem;">Cargá consumos al instante, controlá el stock y cobrá en efectivo o QR.</p>
+                </div>
+                <button type="button" onclick="abrirModalNuevoProducto()" class="btn-nueva-reserva" style="padding: 9px 18px; font-size: 0.85rem;">
+                    <span>+ Agregar Producto al Kiosco</span>
+                </button>
+            </div>
+
+            <div class="pos-layout-grid">
+                <!-- Catálogo de Productos -->
+                <div class="pos-catalogo-card">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;" id="pos-filtros-cat">
+                        <button type="button" class="btn-hoy" onclick="filtrarCantinaCat('todas')">Todos</button>
+                        <button type="button" class="btn-hoy" style="background:none; color:var(--text-muted);" onclick="filtrarCantinaCat('Bebidas')">Bebidas</button>
+                        <button type="button" class="btn-hoy" style="background:none; color:var(--text-muted);" onclick="filtrarCantinaCat('Bebidas con Alcohol')">Cervezas</button>
+                        <button type="button" class="btn-hoy" style="background:none; color:var(--text-muted);" onclick="filtrarCantinaCat('Equipamiento')">Pelotas/Grips</button>
+                        <button type="button" class="btn-hoy" style="background:none; color:var(--text-muted);" onclick="filtrarCantinaCat('Alquileres')">Paletas</button>
+                        <button type="button" class="btn-hoy" style="background:none; color:var(--text-muted);" onclick="filtrarCantinaCat('Comidas')">Comidas</button>
+                    </div>
+
+                    <div class="pos-products-grid" id="pos-grid-productos">
+                        <!-- Inyectado por JS -->
+                    </div>
+                </div>
+
+                <!-- Comanda / Ticket Actual -->
+                <div class="pos-comanda-card">
+                    <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px; border-bottom: 1.5px dashed var(--border-color); padding-bottom: 8px;">
+                        Comanda en Curso
+                    </h3>
+
+                    <div id="comanda-items-lista" style="min-height: 200px; max-height: 280px; overflow-y: auto; margin-bottom: 14px;">
+                        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 40px 0;">
+                            Tocá los productos del catálogo para agregarlos al pedido.
+                        </p>
+                    </div>
+
+                    <div style="border-top: 2px solid var(--border-color); padding-top: 12px; margin-bottom: 14px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 900; color: var(--text-main);">
+                            <span>Total a Cobrar:</span>
+                            <span style="color: var(--primary);" id="comanda-total-display">$0</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 14px;">
+                        <label style="display: block; font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Método de Cobro</label>
+                        <select id="comanda-metodo-pago" style="width: 100%; padding: 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-weight: 700;">
+                            <option value="Efectivo">Efectivo (Caja mostrador)</option>
+                            <option value="Mercado Pago">Mercado Pago / Transferencia QR</option>
+                            <option value="Cargar a Turno">Cargar a la cuenta del turno</option>
+                        </select>
+                    </div>
+
+                    <button type="button" onclick="confirmarVentaCantina()" id="btn-cobrar-pos" class="btn-nueva-reserva" style="width: 100%; justify-content: center; padding: 12px;">
+                        <span>✓ Cobrar Venta</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================
+             PESTAÑA 3: ABONOS FIJOS MENSUALES
+             ==================================================== -->
+        <div id="vista-abonos" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 900; color: var(--text-main);">Abonos Fijos y Turnos Recurrentes</h2>
+                    <p style="color: var(--text-muted); font-size: 0.88rem;">Gestioná los grupos fijos semanales y el estado de la cuota mensual.</p>
+                </div>
+                <button type="button" onclick="abrirModalNuevoAbono()" class="btn-nueva-reserva" style="padding: 9px 18px; font-size: 0.85rem;">
+                    <span>+ Asignar Turno Fijo Mensual</span>
+                </button>
+            </div>
+
+            <div style="background: white; border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-sm);">
+                <table class="abonos-table">
+                    <thead>
+                        <tr>
+                            <th>Día</th>
+                            <th>Horario</th>
+                            <th>Cancha</th>
+                            <th>Titular del Grupo</th>
+                            <th>Teléfono / WhatsApp</th>
+                            <th>Cuota Mensual</th>
+                            <th>Estado de Pago</th>
+                            <th style="text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo-abonos-tabla">
+                        <tr><td colspan="8" style="text-align: center; padding: 30px;">Cargando abonos fijos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ====================================================
+             PESTAÑA 4: ARQUEO Y CIERRE DE CAJA
+             ==================================================== -->
+        <div id="vista-caja" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 900; color: var(--text-main);">Cierre y Balance de Caja Diario</h2>
+                    <p style="color: var(--text-muted); font-size: 0.88rem;">Consolidado de señas Mercado Pago, cobros de canchas en complejo y cantina.</p>
+                </div>
+                <button type="button" onclick="descargarReporteCSV()" class="btn-export-csv">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Descargar Balance del Día (CSV)</span>
+                </button>
+            </div>
+
+            <section class="admin-stats-grid" style="margin-bottom: 24px;">
+                <div class="stat-card">
+                    <div class="stat-label">Señas Online (Mercado Pago)</div>
+                    <div class="stat-value" style="color: #0284c7;" id="caja-senas-mp">$0</div>
+                    <div class="stat-desc">Acreditado automáticamente</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Canchas (A cobrar en mostrador)</div>
+                    <div class="stat-value" style="color: #d97706;" id="caja-canchas-pendientes">$0</div>
+                    <div class="stat-desc">Turnos reservados sin seña MP</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Cantina / Kiosco (Total)</div>
+                    <div class="stat-value" style="color: #16a34a;" id="caja-total-cantina">$0</div>
+                    <div class="stat-desc" id="caja-desc-cantina">Bebidas, comidas y alquileres</div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid var(--primary);">
+                    <div class="stat-label">Caja Recaudada Hoy</div>
+                    <div class="stat-value" style="color: var(--primary);" id="caja-total-recaudado">$0</div>
+                    <div class="stat-desc">Señas MP + Ventas de Cantina</div>
+                </div>
+            </section>
+
+            <!-- Historial de Ventas Cantina Hoy -->
+            <div style="background: white; border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); padding: 20px; box-shadow: var(--shadow-sm);">
+                <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 12px;">Detalle de Ventas de Cantina (Hoy)</h3>
+                <div id="caja-ventas-lista">
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Cargando transacciones...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL DE CARGA MANUAL (ADMIN) -->
+    <div id="modal-admin-manual" class="modal-admin-overlay">
+        <div class="modal-admin-content">
+            <div class="modal-admin-header">
+                <h3 id="modal-admin-titulo" style="font-size: 1.15rem; font-weight: 800;">Anotar Reserva Manual</h3>
+                <button type="button" onclick="cerrarModalManual()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <div class="modal-admin-body">
+                <form id="form-admin-manual" onsubmit="guardarTurnoManual(event)">
+                    <div style="margin-bottom: 14px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:5px;">Cancha</label>
+                        <select id="admin-cancha-select" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                            {% if canchas %}
+                                {% for c in canchas %}
+                                <option value="{{ c.id_instalacion }}">{{ c.nombre_interno }} ({{ c.nombre_deporte }})</option>
+                                {% endfor %}
+                            {% else %}
+                                <option value="1">Cancha 1</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 14px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:5px;">Horario</label>
+                        <select id="admin-hora-select" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                            <option value="08:00">08:00 hs</option>
+                            <option value="09:30">09:30 hs</option>
+                            <option value="11:00">11:00 hs</option>
+                            <option value="12:30">12:30 hs</option>
+                            <option value="14:00">14:00 hs</option>
+                            <option value="15:30">15:30 hs</option>
+                            <option value="17:00">17:00 hs</option>
+                            <option value="18:00">18:00 hs</option>
+                            <option value="18:30">18:30 hs</option>
+                            <option value="19:30">19:30 hs</option>
+                            <option value="20:00">20:00 hs</option>
+                            <option value="21:00">21:00 hs</option>
+                            <option value="21:30">21:30 hs</option>
+                            <option value="22:30">22:30 hs</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 14px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:5px;">Nombre del Jugador</label>
+                        <input type="text" id="admin-jugador-input" placeholder="Ej: Marcos Maidana" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                    </div>
+                    <div style="margin-bottom: 14px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:5px;">Teléfono / WhatsApp</label>
+                        <input type="tel" id="admin-tel-input" placeholder="Ej: 3624112233" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:5px;">Estado de Seña</label>
+                        <select id="admin-seña-select" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                            <option value="Mercado Pago">Seña Acreditada ($8.000 vía MP)</option>
+                            <option value="Club">Pendiente (Abona en el club)</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; gap:10px;">
+                        <button type="button" onclick="cerrarModalManual()" style="padding:9px 16px; border:none; background:#f1f5f9; border-radius:6px; cursor:pointer; font-weight:600;">Cancelar</button>
+                        <button type="submit" style="padding:9px 18px; border:none; background:var(--primary); color:white; border-radius:6px; cursor:pointer; font-weight:700;">Anotar en Grilla</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE DE TURNO Y WHATSAPP -->
+    <div id="modal-detalle-turno" class="modal-admin-overlay">
+        <div class="modal-admin-content" style="max-width: 520px;">
+            <div class="modal-admin-header" style="background: #f8fafc;">
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);">Gestión de Turno</h3>
+                    <span style="font-size: 0.72rem; color: #16a34a; font-weight: 800; text-transform: uppercase;">COMUNICACIÓN DIRECTA WHATSAPP</span>
+                </div>
+                <button type="button" onclick="cerrarModalDetalle()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <div class="modal-admin-body">
+                <div style="background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Titular:</span>
+                        <strong style="color: var(--text-main); font-size: 0.95rem;" id="det-jugador">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Teléfono / WhatsApp:</span>
+                        <strong style="color: var(--text-main); font-size: 0.95rem;" id="det-tel">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Cancha e Instalación:</span>
+                        <strong style="color: var(--text-main); font-size: 0.95rem;" id="det-cancha">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Horario Reservado:</span>
+                        <strong style="color: var(--primary); font-size: 1rem;" id="det-hora">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Estado de Seña:</span>
+                        <span class="badge-seña" id="det-seña">-</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <span style="display: block; font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px;">
+                        Canal Directo de WhatsApp con el Jugador
+                    </span>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a href="#" id="btn-admin-wa-recordatorio" target="_blank" class="btn-whatsapp-accion" style="width: 100%;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                            <span>📲 Enviar Recordatorio de Turno</span>
+                        </a>
+
+                        <a href="#" id="btn-admin-wa-alias" target="_blank" class="btn-whatsapp-secondary" style="width: 100%;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                            <span>💳 Enviar Datos de Pago / Alias para Seña</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border-color);">
+                    <button type="button" onclick="cancelarTurnoAdmin()" style="background: none; border: none; color: #ef4444; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
+                        ✕ Cancelar Turno
+                    </button>
+                    <button type="button" onclick="cerrarModalDetalle()" style="padding: 9px 18px; border: none; background: #f1f5f9; border-radius: 6px; font-weight: 700; cursor: pointer;">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVO PRODUCTO CANTINA -->
+    <div id="modal-nuevo-producto" class="modal-admin-overlay">
+        <div class="modal-admin-content" style="max-width: 440px;">
+            <div class="modal-admin-header">
+                <h3 style="font-size: 1.15rem; font-weight: 800;">Nuevo Producto en Cantina</h3>
+                <button type="button" onclick="cerrarModalNuevoProducto()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <div class="modal-admin-body">
+                <form id="form-nuevo-producto" onsubmit="guardarProductoCantina(event)">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Nombre del Producto</label>
+                        <input type="text" id="prod-nombre" placeholder="Ej: Gatorade Manzana 500ml" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Categoría</label>
+                        <select id="prod-categoria" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                            <option value="Bebidas">Bebidas (Aguas, Isotónicas, Gaseosas)</option>
+                            <option value="Bebidas con Alcohol">Cervezas & Vinos</option>
+                            <option value="Equipamiento">Pelotas / Grips / Accesorios</option>
+                            <option value="Alquileres">Alquiler de Paletas / Chalecos</option>
+                            <option value="Comidas">Pizzas / Tostados / Snacks</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Precio Venta ($)</label>
+                            <input type="number" id="prod-precio" placeholder="2500" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Stock Inicial</label>
+                            <input type="number" id="prod-stock" value="24" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; gap:10px;">
+                        <button type="button" onclick="cerrarModalNuevoProducto()" style="padding:9px 16px; border:none; background:#f1f5f9; border-radius:6px; cursor:pointer; font-weight:600;">Cancelar</button>
+                        <button type="submit" style="padding:9px 18px; border:none; background:var(--primary); color:white; border-radius:6px; cursor:pointer; font-weight:700;">Guardar Producto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVO ABONO FIJO -->
+    <div id="modal-nuevo-abono" class="modal-admin-overlay">
+        <div class="modal-admin-content" style="max-width: 480px;">
+            <div class="modal-admin-header">
+                <h3 style="font-size: 1.15rem; font-weight: 800;">Asignar Abono Fijo Mensual</h3>
+                <button type="button" onclick="cerrarModalNuevoAbono()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <div class="modal-admin-body">
+                <form id="form-nuevo-abono" onsubmit="guardarAbonoFijo(event)">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Cancha</label>
+                        <select id="abono-cancha" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                            {% for c in canchas %}
+                            <option value="{{ c.id_instalacion }}">{{ c.nombre_interno }} ({{ c.nombre_deporte }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Día Fijo de la Semana</label>
+                            <select id="abono-dia" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                                <option value="Lunes">Todos los Lunes</option>
+                                <option value="Martes">Todos los Martes</option>
+                                <option value="Miércoles">Todos los Miércoles</option>
+                                <option value="Jueves">Todos los Jueves</option>
+                                <option value="Viernes">Todos los Viernes</option>
+                                <option value="Sábado">Todos los Sábados</option>
+                                <option value="Domingo">Todos los Domingos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Horario Semanal</label>
+                            <select id="abono-hora" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                                <option value="18:00">18:00 hs</option>
+                                <option value="19:30">19:30 hs</option>
+                                <option value="20:00">20:00 hs</option>
+                                <option value="21:00">21:00 hs</option>
+                                <option value="21:30">21:30 hs</option>
+                                <option value="22:30">22:30 hs</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Titular del Grupo</label>
+                        <input type="text" id="abono-titular" placeholder="Ej: Grupo Los Pibes (Nicolás Gómez)" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">WhatsApp</label>
+                            <input type="tel" id="abono-tel" placeholder="3624112233" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Cuota Mensual ($)</label>
+                            <input type="number" id="abono-monto" value="60000" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; gap:10px;">
+                        <button type="button" onclick="cerrarModalNuevoAbono()" style="padding:9px 16px; border:none; background:#f1f5f9; border-radius:6px; cursor:pointer; font-weight:600;">Cancelar</button>
+                        <button type="submit" style="padding:9px 18px; border:none; background:var(--primary); color:white; border-radius:6px; cursor:pointer; font-weight:700;">Confirmar Abono</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURACIÓN DEL CLUB -->
+    <div id="modal-config-club" class="modal-admin-overlay">
+        <div class="modal-admin-content" style="max-width: 540px;">
+            <div class="modal-admin-header">
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800;">Configuración del Complejo</h3>
+                    <span style="font-size: 0.75rem; color: var(--primary); font-weight: 800;">DATOS OPERATIVOS Y MERCADO PAGO</span>
+                </div>
+                <button type="button" onclick="cerrarModalConfig()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <div class="modal-admin-body">
+                <form id="form-config-club" onsubmit="guardarConfiguracionClub(event)">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Nombre del Complejo</label>
+                        <input type="text" id="cfg-nombre" value="{{ club.nombre_club }}" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Dirección Completa</label>
+                        <input type="text" id="cfg-direccion" value="{{ club.direccion }}" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">WhatsApp de Atención</label>
+                            <input type="tel" id="cfg-telefono" value="{{ club.telefono | default('3624000000') }}" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Alias Mercado Pago / CBU</label>
+                            <input type="text" id="cfg-alias" value="{{ club.alias_mp | default('PUNTONORTE.MP') }}" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Hora de Apertura</label>
+                            <input type="text" id="cfg-apertura" value="{{ club.hora_apertura | default('08:00') }}" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Hora de Cierre</label>
+                            <input type="text" id="cfg-cierre" value="{{ club.hora_cierre | default('00:00') }}" required style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 14px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Servicios y Comodidades</label>
+                        <input type="text" id="cfg-servicios" value="{{ club.servicios | default('Cantina, Vestuarios, Iluminación LED, Estacionamiento, WiFi') }}" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Link de Comunidad / Grupo de WhatsApp</label>
+                        <input type="url" id="cfg-link-wa" value="{{ club.link_grupo_wa | default('https://chat.whatsapp.com/PuntoNorteComunidad') }}" placeholder="https://chat.whatsapp.com/..." style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; gap:10px;">
+                        <button type="button" onclick="cerrarModalConfig()" style="padding:9px 16px; border:none; background:#f1f5f9; border-radius:6px; cursor:pointer; font-weight:600;">Cancelar</button>
+                        <button type="submit" id="btn-save-cfg" style="padding:9px 20px; border:none; background:var(--primary); color:white; border-radius:6px; cursor:pointer; font-weight:700;">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PUBLICAR TURNO ÚLTIMO MINUTO (3 B) -->
+    <div id="modal-crear-oferta" class="modal-admin-overlay">
+        <div class="modal-admin-card" style="max-width: 460px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: #e11d48;">🔥 Publicar Turno Último Minuto</h3>
+                <button type="button" onclick="cerrarModalCrearOferta()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <form id="form-crear-oferta" onsubmit="guardarTurnoOferta(event)">
+                <div style="margin-bottom: 14px;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Cancha a ofertar</label>
+                    <select id="oferta-cancha-select" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                        {% for c in canchas %}
+                        <option value="{{ c.id_instalacion }}">{{ c.nombre_interno }} ({{ c.nombre_deporte }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Fecha</label>
+                        <input type="date" id="oferta-fecha" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Horario</label>
+                        <select id="oferta-hora" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                            <option value="18:00">18:00 hs</option>
+                            <option value="19:30">19:30 hs</option>
+                            <option value="20:00">20:00 hs</option>
+                            <option value="21:00">21:00 hs</option>
+                            <option value="21:30" selected>21:30 hs</option>
+                            <option value="22:30">22:30 hs</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Precio Regular ($)</label>
+                        <input type="number" id="oferta-precio-orig-input" value="16000" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Precio Oferta ($)</label>
+                        <input type="number" id="oferta-precio-promo-input" value="12000" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;" required>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Descripción / Gancho</label>
+                    <input type="text" id="oferta-desc-input" value="Turno liberado por cancelación - ¡Aprovechá 25% OFF!" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:6px;">
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" onclick="cerrarModalCrearOferta()" style="padding:9px 16px; border:none; background:#f1f5f9; border-radius:6px; cursor:pointer; font-weight:600;">Cancelar</button>
+                    <button type="submit" style="padding:9px 20px; border:none; background:#e11d48; color:white; border-radius:6px; cursor:pointer; font-weight:700;">Publicar en SportGrid</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CARTEL QR / BANNER PERSONALIZADO -->
+    <div id="modal-banner-qr" class="modal-admin-overlay">
+        <div class="modal-admin-card" style="max-width: 480px; text-align: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 style="font-size: 1.15rem; font-weight: 800;">Cartel QR para Mostrador</h3>
+                <button type="button" onclick="cerrarModalBannerQR()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <div id="printable-banner-qr" style="border: 2px solid var(--primary); border-radius: 16px; padding: 28px 20px; background: #ffffff;">
+                <div style="font-size: 0.8rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">SPORTGRID · RESERVAS ONLINE</div>
+                <h2 style="font-size: 1.6rem; font-weight: 900; color: var(--text-main); margin-bottom: 4px;">{{ club.nombre_club | default('Punto Norte') }}</h2>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px;">Escaneá este código para ver turnos disponibles y reservar en segundos desde tu celular</p>
+                <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=http://localhost:5001/club/{{ club.id_club | default(1) }}&color=0-94-255" alt="QR del Club" style="border-radius: 12px; padding: 8px; border: 1px solid var(--border-color); width: 200px; height: 200px;">
+                </div>
+                <div style="background: var(--bg-body); border-radius: 8px; padding: 8px; font-size: 0.8rem; font-weight: 700; color: var(--text-main);">
+                    📲 sportgrid.com.ar/club/{{ club.id_club | default(1) }}
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" onclick="cerrarModalBannerQR()" style="padding: 9px 16px; border: none; background: #f1f5f9; border-radius: 6px; font-weight: 600; cursor: pointer;">Cerrar</button>
+                <button type="button" onclick="window.print()" style="padding: 9px 20px; border: none; background: var(--primary); color: white; border-radius: 6px; font-weight: 800; cursor: pointer;">🖨️ Imprimir Cartel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ID_CLUB = {{ club.id_club | default(1) }};
+        const canchasClub = {{ canchas | tojson }};
+        const HORARIOS_AGENDA = ["08:00", "09:30", "11:00", "12:30", "14:00", "15:30", "17:00", "18:00", "18:30", "19:30", "20:00", "21:00", "21:30", "22:30"];
+        
+        let diaOffset = 0;
+        let reservasActuales = [];
+        let turnoDetalleActual = null;
+        let cantinaProductos = [];
+        let comandaActual = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            actualizarFechaDisplay();
+            cargarReservasAdmin();
+            cargarCantina();
+            cargarAbonos();
+            cargarResumenCaja();
+        });
+
+        // 1. Navegación de Pestañas
+        function cambiarPestanaAdmin(pestana) {
+            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-btn-${pestana}`).classList.add('active');
+
+            document.getElementById('vista-agenda').style.display = pestana === 'agenda' ? 'block' : 'none';
+            document.getElementById('vista-cantina').style.display = pestana === 'cantina' ? 'block' : 'none';
+            document.getElementById('vista-abonos').style.display = pestana === 'abonos' ? 'block' : 'none';
+            document.getElementById('vista-caja').style.display = pestana === 'caja' ? 'block' : 'none';
+
+            if (pestana === 'cantina') cargarCantina();
+            if (pestana === 'abonos') cargarAbonos();
+            if (pestana === 'caja') cargarResumenCaja();
+        }
+
+        function getFechaISO(offset) {
+            const f = new Date();
+            f.setDate(f.getDate() + offset);
+            const ano = f.getFullYear();
+            const mes = String(f.getMonth() + 1).padStart(2, '0');
+            const dia = String(f.getDate()).padStart(2, '0');
+            return `${ano}-${mes}-${dia}`;
+        }
+
+        // Descarga de CSV
+        function descargarReporteCSV() {
+            const fechaISO = getFechaISO(diaOffset);
+            window.location.href = `/api/admin/reporte/reservas.csv?fecha=${fechaISO}`;
+        }
+
+        // 2. Agenda de Reservas
+        async function cargarReservasAdmin() {
+            const fechaISO = getFechaISO(diaOffset);
+            try {
+                const res = await fetch(`/api/reservas?club_id=${ID_CLUB}&fecha=${fechaISO}`);
+                reservasActuales = await res.json();
+                renderizarAgendaAdmin();
+            } catch (err) {
+                console.error('Error cargando reservas admin:', err);
+            }
+        }
+
+        function renderizarAgendaAdmin() {
+            const tbody = document.getElementById('cuerpo-agenda-admin');
+            tbody.innerHTML = '';
+
+            const canchas = canchasClub.length > 0 ? canchasClub : [{ id_instalacion: 1, nombre_interno: 'Cancha 1', nombre_deporte: 'Pádel' }];
+
+            const totalSlots = HORARIOS_AGENDA.length * canchas.length;
+            const reservadasCount = reservasActuales.length;
+            const libresCount = Math.max(0, totalSlots - reservadasCount);
+            const ocupacionPct = totalSlots > 0 ? Math.round((reservadasCount / totalSlots) * 100) : 0;
+            
+            let totalSenas = 0;
+            reservasActuales.forEach(r => {
+                if (r.metodo_pago === 'Mercado Pago') {
+                    totalSenas += (r.monto_sena || 8000);
+                }
+            });
+
+            document.getElementById('kpi-reservados').innerText = reservadasCount;
+            document.getElementById('kpi-desc-totales').innerText = `De ${totalSlots} turnos posibles`;
+            document.getElementById('kpi-libres').innerText = libresCount;
+            document.getElementById('kpi-ocupacion').innerText = `${ocupacionPct}%`;
+            document.getElementById('kpi-senas').innerText = `$${totalSenas.toLocaleString('es-AR')}`;
+
+            HORARIOS_AGENDA.forEach(hora => {
+                const tr = document.createElement('tr');
+                const tdHora = document.createElement('td');
+                tdHora.className = 'col-hora';
+                tdHora.innerText = hora;
+                tr.appendChild(tdHora);
+
+                canchas.forEach(cancha => {
+                    const td = document.createElement('td');
+                    const r = reservasActuales.find(res => res.id_instalacion === cancha.id_instalacion && res.hora_inicio.startsWith(hora.split(':')[0]));
+
+                    if (r) {
+                        const esMP = r.metodo_pago === 'Mercado Pago';
+                        const badgeStyle = esMP ? 'background:var(--primary-light); color:var(--primary);' : 'background:#fee2e2; color:#991b1b;';
+                        const badgeTexto = esMP ? 'Seña MP OK' : 'En Club';
+
+                        td.innerHTML = `
+                            <div class="slot-ocupado" onclick="verDetalleReserva('${r.titular_nombre}', '${cancha.nombre_interno}', '${r.hora_inicio}', '${r.titular_telefono}', '${r.metodo_pago}', ${r.monto_sena || 8000}, ${r.id_reserva})">
+                                <div class="slot-jugador">${r.titular_nombre}</div>
+                                <div class="slot-detalles">
+                                    <span>${r.titular_telefono}</span>
+                                    <span class="badge-seña" style="${badgeStyle}">${badgeTexto}</span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        td.innerHTML = `
+                            <div class="slot-libre" onclick="abrirModalManual('${cancha.id_instalacion}', '${hora}')">
+                                + Anotar Turno
+                            </div>
+                        `;
+                    }
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 3. Cantina & POS
+        async function cargarCantina() {
+            try {
+                const res = await fetch(`/api/cantina/productos?club_id=${ID_CLUB}`);
+                cantinaProductos = await res.json();
+                renderizarProductosCantina(cantinaProductos);
+            } catch (e) {
+                console.error('Error cargando cantina:', e);
+            }
+        }
+
+        function renderizarProductosCantina(productos) {
+            const container = document.getElementById('pos-grid-productos');
+            container.innerHTML = '';
+            productos.forEach(p => {
+                const btn = document.createElement('div');
+                btn.className = 'pos-item-btn';
+                btn.onclick = () => agregarItemComanda(p);
+                btn.innerHTML = `
+                    <div>
+                        <div class="pos-item-name">${p.nombre}</div>
+                        <div class="pos-item-cat">${p.categoria}</div>
+                    </div>
+                    <div>
+                        <div class="pos-item-price">$${p.precio.toLocaleString('es-AR')}</div>
+                        <div class="pos-item-stock">Stock: ${p.stock} u.</div>
+                    </div>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function filtrarCantinaCat(cat) {
+            if (cat === 'todas') {
+                renderizarProductosCantina(cantinaProductos);
+            } else {
+                renderizarProductosCantina(cantinaProductos.filter(p => p.categoria.toLowerCase() === cat.toLowerCase()));
+            }
+        }
+
+        function agregarItemComanda(producto) {
+            const index = comandaActual.findIndex(i => i.id_producto === producto.id_producto);
+            if (index >= 0) {
+                comandaActual[index].cantidad++;
+                comandaActual[index].subtotal = comandaActual[index].cantidad * comandaActual[index].precio;
+            } else {
+                comandaActual.push({
+                    id_producto: producto.id_producto,
+                    nombre: producto.nombre,
+                    precio: producto.precio,
+                    cantidad: 1,
+                    subtotal: producto.precio
+                });
+            }
+            renderizarComanda();
+        }
+
+        function cambiarCantComanda(index, delta) {
+            comandaActual[index].cantidad += delta;
+            if (comandaActual[index].cantidad <= 0) {
+                comandaActual.splice(index, 1);
+            } else {
+                comandaActual[index].subtotal = comandaActual[index].cantidad * comandaActual[index].precio;
+            }
+            renderizarComanda();
+        }
+
+        function renderizarComanda() {
+            const container = document.getElementById('comanda-items-lista');
+            if (comandaActual.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 40px 0;">Tocá los productos del catálogo para agregarlos al pedido.</p>`;
+                document.getElementById('comanda-total-display').innerText = '$0';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = comandaActual.map((item, idx) => {
+                total += item.subtotal;
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <div>
+                            <div style="font-weight: 800; font-size: 0.86rem;">${item.nombre}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">$${item.precio} c/u</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button type="button" onclick="cambiarCantComanda(${idx}, -1)" style="width: 24px; height: 24px; border: 1px solid var(--border-color); background: white; border-radius: 4px; cursor: pointer; font-weight: 800;">-</button>
+                            <span style="font-weight: 800; font-size: 0.9rem;">${item.cantidad}</span>
+                            <button type="button" onclick="cambiarCantComanda(${idx}, 1)" style="width: 24px; height: 24px; border: 1px solid var(--border-color); background: white; border-radius: 4px; cursor: pointer; font-weight: 800;">+</button>
+                            <span style="font-weight: 900; font-size: 0.88rem; min-width: 60px; text-align: right; color: var(--primary);">$${item.subtotal.toLocaleString('es-AR')}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('comanda-total-display').innerText = `$${total.toLocaleString('es-AR')}`;
+        }
+
+        async function confirmarVentaCantina() {
+            if (comandaActual.length === 0) return alert('No hay artículos agregados.');
+            const total = comandaActual.reduce((acc, item) => acc + item.subtotal, 0);
+            const metodo = document.getElementById('comanda-metodo-pago').value;
+
+            try {
+                const res = await fetch('/api/cantina/ventas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        metodo_pago: metodo,
+                        total: total,
+                        items: comandaActual
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`¡Venta de $${total.toLocaleString('es-AR')} registrada con éxito! (${metodo})`);
+                    comandaActual = [];
+                    renderizarComanda();
+                    cargarCantina();
+                    cargarResumenCaja();
+                } else {
+                    alert(data.error || 'Error al procesar la venta');
+                }
+            } catch (e) {
+                alert('Error al conectar con el servidor.');
+            }
+        }
+
+        function abrirModalNuevoProducto() { document.getElementById('modal-nuevo-producto').classList.add('abierto'); }
+        function cerrarModalNuevoProducto() { document.getElementById('modal-nuevo-producto').classList.remove('abierto'); }
+
+        async function guardarProductoCantina(e) {
+            e.preventDefault();
+            const payload = {
+                nombre: document.getElementById('prod-nombre').value,
+                categoria: document.getElementById('prod-categoria').value,
+                precio: document.getElementById('prod-precio').value,
+                stock: document.getElementById('prod-stock').value
+            };
+            try {
+                const res = await fetch('/api/cantina/productos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    cerrarModalNuevoProducto();
+                    cargarCantina();
+                    alert('Producto agregado al kiosco.');
+                }
+            } catch (err) { alert('Error al guardar el producto.'); }
+        }
+
+        // 4. Abonos Fijos Mensuales
+        async function cargarAbonos() {
+            try {
+                const res = await fetch(`/api/admin/abonos?club_id=${ID_CLUB}`);
+                const abonos = await res.json();
+                const tbody = document.getElementById('cuerpo-abonos-tabla');
+                if (abonos.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 30px;">No hay abonos fijos registrados en este club.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = abonos.map(a => {
+                    const alDia = a.estado_pago === 'Al día';
+                    const badgeClass = alDia ? 'badge-pago-al-dia' : 'badge-pago-pendiente';
+                    return `
+                        <tr>
+                            <td><strong>${a.dia_semana}</strong></td>
+                            <td style="color: var(--primary); font-weight: 800;">${a.hora_inicio} hs</td>
+                            <td>${a.cancha_nombre}</td>
+                            <td><strong>${a.titular_nombre}</strong></td>
+                            <td>${a.titular_telefono}</td>
+                            <td style="font-weight: 800;">$${a.monto_mensual.toLocaleString('es-AR')}</td>
+                            <td><span class="${badgeClass}">${a.estado_pago}</span></td>
+                            <td style="text-align: right;">
+                                <button type="button" onclick="cambiarEstadoAbono(${a.id_abono})" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); cursor: pointer; background: white;">
+                                    ${alDia ? 'Marcar Pendiente' : 'Marcar Pagado'}
+                                </button>
+                                <button type="button" onclick="eliminarAbono(${a.id_abono})" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; border: 1px solid #fecaca; color: #ef4444; cursor: pointer; background: #fff1f2; margin-left: 4px;">
+                                    ✕
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (e) { console.error('Error cargando abonos:', e); }
+        }
+
+        async function cambiarEstadoAbono(idAbono) {
+            await fetch(`/api/admin/abonos/${idAbono}/estado-pago`, { method: 'POST' });
+            cargarAbonos();
+        }
+
+        async function eliminarAbono(idAbono) {
+            if (!confirm('¿Seguro de dar de baja este abono fijo?')) return;
+            await fetch(`/api/admin/abonos/${idAbono}/eliminar`, { method: 'POST' });
+            cargarAbonos();
+        }
+
+        function abrirModalNuevoAbono() { document.getElementById('modal-nuevo-abono').classList.add('abierto'); }
+        function cerrarModalNuevoAbono() { document.getElementById('modal-nuevo-abono').classList.remove('abierto'); }
+
+        async function guardarAbonoFijo(e) {
+            e.preventDefault();
+            const payload = {
+                id_instalacion: document.getElementById('abono-cancha').value,
+                dia_semana: document.getElementById('abono-dia').value,
+                hora_inicio: document.getElementById('abono-hora').value,
+                titular_nombre: document.getElementById('abono-titular').value,
+                titular_telefono: document.getElementById('abono-tel').value,
+                monto_mensual: document.getElementById('abono-monto').value
+            };
+            try {
+                const res = await fetch('/api/admin/abonos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    cerrarModalNuevoAbono();
+                    cargarAbonos();
+                    alert('Abono mensual asignado con éxito.');
+                }
+            } catch (err) { alert('Error al guardar el abono.'); }
+        }
+
+        // 5. Arqueo de Caja
+        async function cargarResumenCaja() {
+            const fechaISO = getFechaISO(diaOffset);
+            try {
+                const res = await fetch(`/api/admin/caja?fecha=${fechaISO}`);
+                const caja = await res.json();
+                document.getElementById('caja-senas-mp').innerText = `$${caja.senas_cobradas_mp.toLocaleString('es-AR')}`;
+                document.getElementById('caja-canchas-pendientes').innerText = `$${caja.canchas_saldo_en_complejo.toLocaleString('es-AR')}`;
+                document.getElementById('caja-total-cantina').innerText = `$${caja.total_cantina.toLocaleString('es-AR')}`;
+                document.getElementById('caja-desc-cantina').innerText = `Efectivo: $${caja.cantina_efectivo.toLocaleString('es-AR')} · QR: $${caja.cantina_mp.toLocaleString('es-AR')}`;
+                document.getElementById('caja-total-recaudado').innerText = `$${caja.caja_total_general.toLocaleString('es-AR')}`;
+
+                // Ventas lista
+                const resVentas = await fetch(`/api/cantina/ventas?club_id=${ID_CLUB}&fecha=${fechaISO}`);
+                const ventas = await resVentas.json();
+                const container = document.getElementById('caja-ventas-lista');
+                if (ventas.length === 0) {
+                    container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 10px 0;">No hay ventas registradas en la cantina en esta fecha.</p>`;
+                    return;
+                }
+                container.innerHTML = ventas.map(v => `
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 0.88rem;">
+                        <div>
+                            <strong>#${v.id_venta}</strong> · ${v.fecha_hora.split(' ')[1]} hs (${v.metodo_pago})
+                        </div>
+                        <strong style="color: var(--primary);">$${v.total.toLocaleString('es-AR')}</strong>
+                    </div>
+                `).join('');
+            } catch (e) { console.error('Error cargando caja:', e); }
+        }
+
+        // Navegación de Fecha
+        function cambiarDia(delta) {
+            diaOffset += delta;
+            actualizarFechaDisplay();
+            cargarReservasAdmin();
+            cargarResumenCaja();
+        }
+
+        function irAHoy() {
+            diaOffset = 0;
+            actualizarFechaDisplay();
+            cargarReservasAdmin();
+            cargarResumenCaja();
+        }
+
+        function actualizarFechaDisplay() {
+            const fecha = new Date();
+            fecha.setDate(fecha.getDate() + diaOffset);
+            const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
+            const texto = fecha.toLocaleDateString('es-AR', opciones);
+            document.getElementById('admin-fecha-actual').innerText = texto.charAt(0).toUpperCase() + texto.slice(1);
+        }
+
+        // Modal Manual
+        function abrirModalManual(idCancha, hora) {
+            if (idCancha) document.getElementById('admin-cancha-select').value = idCancha;
+            if (hora) document.getElementById('admin-hora-select').value = hora;
+            document.getElementById('modal-admin-manual').classList.add('abierto');
+        }
+
+        function cerrarModalManual() {
+            document.getElementById('modal-admin-manual').classList.remove('abierto');
+        }
+
+        async function guardarTurnoManual(e) {
+            e.preventDefault();
+            const idCancha = document.getElementById('admin-cancha-select').value;
+            const hora = document.getElementById('admin-hora-select').value;
+            const jugador = document.getElementById('admin-jugador-input').value;
+            const tel = document.getElementById('admin-tel-input').value;
+            const metodo = document.getElementById('admin-seña-select').value;
+            const fechaISO = getFechaISO(diaOffset);
+
+            const payload = {
+                id_instalacion: parseInt(idCancha),
+                fecha: fechaISO,
+                hora_inicio: hora,
+                duracion: 90,
+                titular_nombre: jugador,
+                titular_telefono: tel,
+                metodo_pago: metodo,
+                monto_total: 16000,
+                monto_sena: metodo === 'Mercado Pago' ? 8000 : 0
+            };
+
+            try {
+                const res = await fetch('/api/reservas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.id_reserva) {
+                    cerrarModalManual();
+                    await cargarReservasAdmin();
+                    alert(`¡Turno asignado con éxito a ${jugador}!`);
+                } else {
+                    alert(data.error || 'No se pudo guardar la reserva');
+                }
+            } catch (err) {
+                alert('Error al conectar con el servidor');
+            }
+        }
+
+        // Modal Detalle & WhatsApp
+        function verDetalleReserva(nombre, cancha, hora, tel, metodoPago, montoSeña, idReserva) {
+            turnoDetalleActual = { nombre, cancha, hora, tel, metodoPago, montoSeña, id_reserva: idReserva };
+            
+            document.getElementById('det-jugador').innerText = nombre;
+            document.getElementById('det-cancha').innerText = cancha;
+            document.getElementById('det-hora').innerText = `${hora} hs`;
+            document.getElementById('det-tel').innerText = tel;
+            
+            const badgeSeña = document.getElementById('det-seña');
+            const esMP = metodoPago === 'Mercado Pago';
+            badgeSeña.innerText = esMP ? `Seña Acreditada ($${montoSeña.toLocaleString('es-AR')}) ✓ MP` : 'Pago pendiente en complejo';
+            badgeSeña.style.background = esMP ? 'var(--primary-light)' : '#fee2e2';
+            badgeSeña.style.color = esMP ? 'var(--primary)' : '#991b1b';
+
+            const clubNombre = "{{ club.nombre_club | default('Punto Norte Sport Complex') }}";
+            const telSanitizado = tel.replace(/\D/g, '');
+            const fechaTexto = document.getElementById('admin-fecha-actual').innerText;
+
+            const msgRecordatorio = encodeURIComponent(
+                `Hola ${nombre}! 👋 Te escribimos de ${clubNombre}.\n\n` +
+                `Te recordamos tu turno para ${fechaTexto} a las ${hora} hs en ${cancha}.\n` +
+                `Estado de seña: ${esMP ? 'Acreditada ✅' : 'Pendiente a abonar en recepción'}.\n\n` +
+                `Por favor presentate 10 minutos antes del partido. ¡Los esperamos!`
+            );
+            document.getElementById('btn-admin-wa-recordatorio').href = `https://wa.me/549${telSanitizado}?text=${msgRecordatorio}`;
+
+            const aliasClub = "{{ club.alias_mp | default('PUNTONORTE.MP') }}";
+            const msgAlias = encodeURIComponent(
+                `Hola ${nombre}! 👋 Para confirmar tu turno en ${clubNombre} a las ${hora} hs en ${cancha}, podés transferir la seña al Alias oficial:\n\n` +
+                `🏦 Alias: ${aliasClub}\n` +
+                `💼 Titular: ${clubNombre}\n` +
+                `💰 Seña: $${montoSeña.toLocaleString('es-AR')}\n\n` +
+                `Por favor envianos el comprobante por acá una vez transferido. ¡Muchas gracias!`
+            );
+            document.getElementById('btn-admin-wa-alias').href = `https://wa.me/549${telSanitizado}?text=${msgAlias}`;
+
+            document.getElementById('modal-detalle-turno').classList.add('abierto');
+        }
+
+        function cerrarModalDetalle() {
+            document.getElementById('modal-detalle-turno').classList.remove('abierto');
+        }
+
+        async function cancelarTurnoAdmin() {
+            if (!turnoDetalleActual) return;
+            if (!confirm(`¿Estás seguro de cancelar el turno de ${turnoDetalleActual.nombre} a las ${turnoDetalleActual.hora} hs?`)) return;
+
+            try {
+                const res = await fetch(`/api/reservas/${turnoDetalleActual.id_reserva}/cancelar`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    const telSanitizado = turnoDetalleActual.tel.replace(/\D/g, '');
+                    const msgCancel = encodeURIComponent(
+                        `Hola ${turnoDetalleActual.nombre}. Te informamos que por razones operativas tu turno de las ${turnoDetalleActual.hora} hs en ${turnoDetalleActual.cancha} fue cancelado. Por favor comunicate con nosotros para reprogramarlo.`
+                    );
+                    window.open(`https://wa.me/549${telSanitizado}?text=${msgCancel}`, '_blank');
+                    cerrarModalDetalle();
+                    await cargarReservasAdmin();
+                } else {
+                    alert(data.error || 'No se pudo cancelar el turno');
+                }
+            } catch (err) {
+                alert('Error al cancelar el turno');
+            }
+        }
+
+        // Modal Configuración Club
+        function abrirModalConfig() { document.getElementById('modal-config-club').classList.add('abierto'); }
+        function cerrarModalConfig() { document.getElementById('modal-config-club').classList.remove('abierto'); }
+
+        // Modal Banner QR
+        function abrirModalBannerQR() { document.getElementById('modal-banner-qr').classList.add('abierto'); }
+        function cerrarModalBannerQR() { document.getElementById('modal-banner-qr').classList.remove('abierto'); }
+
+        // Modal Oferta Último Minuto (3 B)
+        function abrirModalCrearOferta() {
+            const hoy = new Date().toISOString().split('T')[0];
+            const inp = document.getElementById('oferta-fecha');
+            if (inp) inp.value = hoy;
+            document.getElementById('modal-crear-oferta').classList.add('abierto');
+        }
+        function cerrarModalCrearOferta() {
+            document.getElementById('modal-crear-oferta').classList.remove('abierto');
+        }
+
+        async function guardarTurnoOferta(e) {
+            e.preventDefault();
+            const payload = {
+                id_instalacion: document.getElementById('oferta-cancha-select').value,
+                fecha: document.getElementById('oferta-fecha').value,
+                hora_inicio: document.getElementById('oferta-hora').value,
+                precio_original: document.getElementById('oferta-precio-orig-input').value,
+                precio_oferta: document.getElementById('oferta-precio-promo-input').value,
+                descripcion: document.getElementById('oferta-desc-input').value
+            };
+            try {
+                const res = await fetch('/api/admin/turnos-ofertas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (window.mostrarToast) mostrarToast('¡Oferta publicada con éxito en SportGrid!', 'success');
+                    else alert('¡Oferta de último minuto publicada!');
+                    cerrarModalCrearOferta();
+                } else {
+                    alert(data.error || 'No se pudo publicar la oferta');
+                }
+            } catch (err) {
+                alert('Error al conectar con el servidor.');
+            }
+        }
+
+        async function guardarConfiguracionClub(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-cfg');
+            btn.disabled = true;
+            btn.innerText = 'Guardando...';
+
+            const payload = {
+                nombre_club: document.getElementById('cfg-nombre').value,
+                direccion: document.getElementById('cfg-direccion').value,
+                telefono: document.getElementById('cfg-telefono').value,
+                alias_mp: document.getElementById('cfg-alias').value,
+                hora_apertura: document.getElementById('cfg-apertura').value,
+                hora_cierre: document.getElementById('cfg-cierre').value,
+                servicios: document.getElementById('cfg-servicios').value,
+                link_grupo_wa: document.getElementById('cfg-link-wa')?.value || ''
+            };
+
+            try {
+                const res = await fetch('/api/admin/club/configuracion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                btn.disabled = false;
+                btn.innerText = 'Guardar Cambios';
+                document.getElementById('nav-club-display').innerText = `${data.nombre_club} · ${data.ciudad}`;
+                cerrarModalConfig();
+                if (window.mostrarToast) mostrarToast('¡Datos del complejo actualizados con éxito!', 'success');
+                else alert('¡Datos del complejo y Mercado Pago actualizados con éxito!');
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerText = 'Guardar Cambios';
+                alert('Error al guardar la configuración');
+            }
+        }
+    </script>
+</body>
+</html>

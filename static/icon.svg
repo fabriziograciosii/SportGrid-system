@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="sgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005aff"/>
+      <stop offset="100%" stop-color="#003db3"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#sgGrad)"/>
+  <text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-weight="900" font-size="240" fill="#ffffff" letter-spacing="-8">SG</text>
+  <circle cx="390" cy="130" r="32" fill="#10b981"/>
+</svg>

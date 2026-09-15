@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software para Clubes y Complejos Deportivos | SPORTGRID</title>
+    <meta name="description" content="El sistema de gestión integral para clubes de pádel, fútbol y tenis en Argentina. Turnos 24/7, cobro de señas con Mercado Pago y control de cantina.">
+    <!-- PWA & Mobile Web App -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#005aff">
+    <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
+    <!-- Open Graph / Redes Sociales & WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SportGrid Argentina">
+    <meta property="og:title" content="Software para Clubes y Complejos Deportivos | SPORTGRID">
+    <meta property="og:description" content="Automatizá tus turnos, cobrá señas con Mercado Pago y aumentá la ocupación de tus canchas.">
+    <meta property="og:image" content="/static/icon.svg">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+</head>
+<body style="background: #f8fafc; color: #0f172a;">
+
+    <!-- 1. NAVBAR UNIFICADA -->
+    <header class="navbar">
+        <a href="/" class="logo">
+            <span class="logo-sport">SPORT</span><span class="logo-grid">GRID</span>
+            <span class="nav-badge">CLUBES</span>
+        </a>
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="#soluciones">Soluciones</a>
+            <a href="#funcionalidades">Funcionalidades</a>
+            <a href="#precios">Precios</a>
+            <a href="#faq">Preguntas frecuentes</a>
+            <a href="https://wa.me/5493624000000?text=Hola,%20quiero%20conocer%20SportGrid%20para%20mi%20club" target="_blank" class="btn-iniciar-sesion">Hablar con asesor</a>
+            <a href="/admin" class="btn-software-clubes">Probar demo operativa &rarr;</a>
+        </nav>
+    </header>
+
+    <!-- 2. HERO PRINCIPAL B2B (Inspirado en imágenes 1 y 3) -->
+    <section style="padding: 80px 8% 55px; text-align: center; background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.08), transparent 70%);">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <span style="background: var(--primary-light); color: var(--primary); font-weight: 800; font-size: 0.78rem; padding: 6px 18px; border-radius: 9999px; letter-spacing: 0.8px; display: inline-block; margin-bottom: 18px; border: 1px solid var(--primary-border); text-transform: uppercase;">
+                PLATAFORMA INTEGRAL DE GESTIÓN DEPORTIVA
+            </span>
+            <h1 style="font-size: 3.3rem; font-weight: 900; line-height: 1.15; margin-bottom: 18px; letter-spacing: -1px; color: var(--text-main);">
+                Control total de turnos, <span style="color: var(--primary);">caja y cantina para tu club</span>
+            </h1>
+            <p style="font-size: 1.2rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 32px;">
+                Digitalizá la operación de tu complejo con una solución accesible, moderna y escalable. Automatizá tus reservas 24/7, cobrá señas directamente a tu cuenta bancaria y gestioná el stock de cantina sin costos ocultos.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+                <a href="#precios" class="btn-software-clubes" style="font-size: 1rem; padding: 13px 32px;">VER PLANES Y PRECIOS</a>
+                <a href="/admin" class="btn-iniciar-sesion" style="font-size: 1rem; padding: 12px 26px;">Ver grilla operativa en vivo &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. PILARES PROFESIONALES DE SPORTGRID (Con SVGs limpios) -->
+    <section id="soluciones" style="padding: 40px 8% 65px; max-width: 1200px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 45px;">
+            <h2 style="font-size: 2.1rem; font-weight: 900; color: var(--text-main); letter-spacing: -0.5px;">
+                Diseñado para maximizar la rentabilidad de tu complejo
+            </h2>
+            <p style="color: var(--text-muted); font-size: 1.05rem; margin-top: 6px;">
+                Una plataforma unificada que acompaña el crecimiento de tu club deportivo.
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 28px;">
+            <!-- Pilar 1 -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 34px 28px; box-shadow: var(--shadow-sm);">
+                <div style="width: 50px; height: 50px; background: var(--primary-light); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Agenda Dinámica Multicancha</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.55;">
+                    Visualizá la disponibilidad de todas tus canchas en una grilla interactiva de 08:00 a 00:00 hs. Bloqueá turnos manuales en 2 clics y gestioná turnos fijos recurrentes sin superposiciones.
+                </p>
+            </div>
+
+            <!-- Pilar 2 -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 34px 28px; box-shadow: var(--shadow-sm);">
+                <div style="width: 50px; height: 50px; background: var(--accent-light); color: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                </div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Cobro Directo a tu Cuenta</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.55;">
+                    Configurá tu propio Alias CBU/CVU de Mercado Pago o banco para que los cobros de señas ingresen directamente a tu cuenta, con acreditación inmediata y sin retenciones intermediarias.
+                </p>
+            </div>
+
+            <!-- Pilar 3 -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 34px 28px; box-shadow: var(--shadow-sm);">
+                <div style="width: 50px; height: 50px; background: var(--primary-light); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                </div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Módulo Cantina & Tercer Tiempo</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.55;">
+                    Controlá el bufet, bebidas, tubos de pelotas y alquiler de paletas. Asociá consumos adicionales a la cuenta del turno para agilizar el cobro final en mostrador y llevar arqueos de caja precisos.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. CALCULADORA DE RECUPERACIÓN DE INGRESOS -->
+    <section style="padding: 20px 8% 50px; max-width: 1050px; margin: 0 auto;">
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 36px 40px; box-shadow: var(--shadow-sm);">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.3px;">Calculá la optimización de ingresos de tu complejo</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Estimación basada en recuperación de turnos vacíos mediante seña previa y ventas en cantina.</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: center;">
+                <div>
+                    <label style="display: block; font-weight: 700; margin-bottom: 10px; color: var(--text-main);">
+                        Canchas en tu complejo: <span id="val-canchas" style="color: var(--primary); font-size: 1.35rem; font-weight: 900;">3</span>
+                    </label>
+                    <input type="range" id="slider-canchas" min="1" max="12" value="3" style="width: 100%; accent-color: var(--primary); cursor: pointer;" oninput="actualizarCalculadora()">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; font-weight: 600;">
+                        <span>1 Cancha</span>
+                        <span>6 Canchas</span>
+                        <span>12+ Canchas</span>
+                    </div>
+                </div>
+
+                <div style="background: var(--primary-light); padding: 20px 24px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--primary-border);">
+                    <div style="font-size: 0.78rem; color: var(--primary-dark); font-weight: 800; text-transform: uppercase;">Recuperación mensual estimada</div>
+                    <div style="font-size: 2.2rem; font-weight: 900; color: var(--primary); margin: 4px 0;" id="monto-recuperado">+$180.000 /mes</div>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 500;">La plataforma se amortiza sola al asegurar la asistencia de los turnos programados.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. TABLA DE PLANES DETALLADOS (Conforme a los servicios solicitados) -->
+    <section id="precios" style="padding: 50px 8% 80px; text-align: center;">
+        <h2 style="font-size: 2.4rem; font-weight: 900; margin-bottom: 10px; color: var(--text-main); letter-spacing: -0.5px;">Planes accesibles para crecer a tu ritmo</h2>
+        <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 26px;">Comenzá con lo que necesitás hoy y escalá a medida que sumes canchas. Sin contratos forzados.</p>
+
+        <!-- Toggle Mensual / Anual (20% OFF) -->
+        <div style="display: inline-flex; background: white; padding: 5px; border-radius: 9999px; margin-bottom: 45px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <button id="btn-toggle-mensual" onclick="setBilling('mensual')" style="background: transparent; color: var(--text-muted); border: none; padding: 10px 24px; border-radius: 9999px; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s;">
+                PAGO MENSUAL
+            </button>
+            <button id="btn-toggle-anual" onclick="setBilling('anual')" style="background: var(--primary); color: white; border: none; padding: 10px 24px; border-radius: 9999px; font-weight: 800; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px;">
+                <span>PAGO ANUAL</span>
+                <span style="background: rgba(255,255,255,0.25); color: white; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px;">20% OFF</span>
+            </button>
+        </div>
+
+        <!-- Grilla de los 3 Planes con características explícitas -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; max-width: 1200px; margin: 0 auto 55px; text-align: left;">
+            
+            <!-- Plan 1: Despegue / Inicial -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 34px 28px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                <div style="font-size: 1.35rem; font-weight: 900; color: var(--text-main); margin-bottom: 2px;">Plan Despegue</div>
+                <div style="color: var(--primary); font-weight: 700; font-size: 0.92rem; margin-bottom: 18px;">1 a 2 Canchas (Para comenzar)</div>
+                
+                <div style="color: var(--text-light); text-decoration: line-through; font-size: 0.95rem; font-weight: 600;" id=\"tachado-base\">$40.000</div>
+                <div style="font-size: 2.5rem; font-weight: 900; color: var(--text-main); margin: 4px 0 2px;">
+                    <span id="precio-base">$32.000</span><span style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">/mes</span>
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; font-weight: 600;" id="anual-base">$384.000 por 12 meses</div>
+
+                <a href="/admin" class="btn-software-clubes" style="display: block; text-align: center; border-radius: 10px; padding: 12px; margin-bottom: 24px; justify-content: center;">PROBAR 1 MES GRATIS</a>
+
+                <div style="font-size: 0.85rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">Servicios incluidos:</div>
+                <ul style="list-style: none; font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 10px; font-weight: 500;">
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Sistema de gestión de turnos</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Grilla de turnos dinámica (08 a 00 hs)</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Cobro de señas directo a tu CBU/Alias</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Web propia y perfil del complejo</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Multiplataforma (PC, tablet, celular)</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Soporte técnico por WhatsApp</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Plan 2: Complejo Pro -->
+            <div style="background: white; border: 2px solid var(--primary); border-radius: var(--radius-lg); padding: 34px 28px; position: relative; box-shadow: var(--shadow-lg); display: flex; flex-direction: column;">
+                <div style="position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; font-weight: 900; font-size: 0.72rem; padding: 4px 14px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    MÁS ELEGIDO
+                </div>
+                <div style="font-size: 1.35rem; font-weight: 900; color: var(--text-main); margin-bottom: 2px;">Complejo Pro</div>
+                <div style="color: var(--primary); font-weight: 700; font-size: 0.92rem; margin-bottom: 18px;">3 a 5 Canchas (Gestión total)</div>
+                
+                <div style="color: var(--text-light); text-decoration: line-through; font-size: 0.95rem; font-weight: 600;" id="tachado-std">$68.000</div>
+                <div style="font-size: 2.5rem; font-weight: 900; color: var(--text-main); margin: 4px 0 2px;">
+                    <span id="precio-std">$54.000</span><span style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">/mes</span>
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; font-weight: 600;" id="anual-std">$648.000 por 12 meses</div>
+
+                <a href="/admin" class="btn-software-clubes" style="display: block; text-align: center; border-radius: 10px; padding: 12px; margin-bottom: 24px; justify-content: center;">PROBAR 1 MES GRATIS</a>
+
+                <div style="font-size: 0.85rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">Servicios incluidos:</div>
+                <ul style="list-style: none; font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 10px; font-weight: 500;">
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <strong style="color: var(--text-main);">Todo lo del Plan Despegue</strong>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Gestión de caja y stock (Cantina & Kiosco)</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Multiusuario en simultáneo</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Automatización de reservas 24/7</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Split 4 (división de pago entre jugadores)</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Banners personalizados con código QR</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Reportes estadísticos y arqueos diarios</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Plan 3: Máster / Cadenas -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 34px 28px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                <div style="font-size: 1.35rem; font-weight: 900; color: var(--text-main); margin-bottom: 2px;">Plan Máster</div>
+                <div style="color: var(--primary); font-weight: 700; font-size: 0.92rem; margin-bottom: 18px;">6 o más Canchas / Multisede</div>
+                
+                <div style="color: var(--text-light); text-decoration: line-through; font-size: 0.95rem; font-weight: 600;" id="tachado-full">$106.000</div>
+                <div style="font-size: 2.5rem; font-weight: 900; color: var(--text-main); margin: 4px 0 2px;">
+                    <span id="precio-full">$85.000</span><span style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">/mes</span>
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; font-weight: 600;" id="anual-full">$1.020.000 por 12 meses</div>
+
+                <a href="/admin" class="btn-software-clubes" style="display: block; text-align: center; border-radius: 10px; padding: 12px; margin-bottom: 24px; justify-content: center;">PROBAR 1 MES GRATIS</a>
+
+                <div style="font-size: 0.85rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">Servicios incluidos:</div>
+                <ul style="list-style: none; font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 10px; font-weight: 500;">
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <strong style="color: var(--text-main);">Todas las funcionalidades incluidas</strong>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Gestión centralizada multisede</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Filmación de partidos integrada (Beelup, etc.)</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Integración de control de acceso y molinetes</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Asesoramiento y consultoría de optimización</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span class="check-icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Soporte técnico prioritario 24/7</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- 6. MATRIZ DE 15 SERVICIOS (Imagen 4) -->
+        <div id="funcionalidades" class="features-checklist-card" style="background: #eef2f6; padding: 45px 36px; border-radius: var(--radius-lg); margin-bottom: 60px;">
+            <h3 class="features-checklist-title" style="font-size: 1.8rem; margin-bottom: 28px;">
+                Sistema integral de control y gestión para clubes
+            </h3>
+            
+            <div class="features-grid-3col" style="margin-bottom: 0;">
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Sistema de gestión de turnos</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Gestión de caja y stock</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Reportes estadísticos</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Web propia del complejo</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Grilla de turnos dinámica</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Multiusuario</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Multiplataforma (celular, pc, tablet)</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Información de las canchas</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Filmación de partidos (Beelup, etc)</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Automatización de reservas</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Pack digital personalizado</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Banners personalizados con QR</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Soporte 24/7</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Asesoramiento para optimizar tu club</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <span>Ventas 24/7</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. PREGUNTAS FRECUENTES (Imagen 2) -->
+        <div class="faq-container" id="faq" style="text-align: left;">
+            <h3 class="faq-title" style="font-size: 2.1rem; margin-bottom: 24px;">Preguntas frecuentes</h3>
+            
+            <div class="faq-card">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Cuál es el precio del sistema?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Ofrecemos planes desde $32.000/mes para complejos de 1 a 2 canchas, $54.000/mes para complejos de 3 a 5 canchas y planes para grandes clubes. Podés optar por pago mensual o anual con un 20% de descuento, sin contratos forzados.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Se pueden cobrar señas a través de la página?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí. Podés vincular tu propio Alias bancario (CBU, CVU o cuenta de Mercado Pago) para que las señas ingresen directamente a tu cuenta al instante, sin comisión intermediaria.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Cuántos usuarios administradores se puede tener?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        El sistema es multiusuario. Podés crear cuentas para dueños, secretarios, encargados de turno y personal de cantina para operar simultáneamente desde varios dispositivos.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Se pueden cargar reservas de manera interna además de recibir reservas online?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Totalmente. Podés cargar reservas telefónicas o presenciales en 2 clics, fijar turnos recurrentes semanales y bloquear canchas por mantenimiento o lluvia.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Se pueden configurar precios especiales según el día y horario?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí, podés definir tarifas diferenciadas para horarios diurnos, nocturnos (con luz artificial), fines de semana y días feriados.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Se puede agregar los consumos que realice el cliente?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí. El módulo de cantina permite cargar bebidas, pelotas, bebidas isotónicas o alquiler de paletas a la cuenta del turno para liquidar todo junto en mostrador.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Cuentan con capacitación y soporte para el uso del sistema?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí. Incluimos asistencia en la puesta en marcha inicial, carga de canchas, capacitación a tu equipo y soporte técnico permanente por WhatsApp.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN: FORMULARIO SUMAR MI CLUB -->
+    <section id="sumar-club" style="padding: 70px 8%; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white;">
+        <div style="max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; align-items: center;">
+            <div>
+                <span style="color: var(--accent); font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">SUMÁ TU COMPLEJO</span>
+                <h2 style="font-size: 2.2rem; font-weight: 900; line-height: 1.15; margin: 8px 0 16px;">Empezá a automatizar tus reservas hoy</h2>
+                <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px;">
+                    Completá tus datos y un asesor se pondrá en contacto para configurar tus canchas y activar tu prueba gratuita de 1 mes sin compromiso.
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; color: #cbd5e1;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #10b981; font-weight: 900;">✓</span> Puesta en marcha en menos de 24 horas.
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #10b981; font-weight: 900;">✓</span> Soporte prioritario por WhatsApp los 7 días.
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #10b981; font-weight: 900;">✓</span> Cobro de señas directo a tu Mercado Pago.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Formulario -->
+            <div style="background: white; border-radius: 16px; padding: 32px; color: var(--text-main); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 18px; color: var(--text-main);">Solicitar Prueba Gratuita</h3>
+                <form id="form-sumar-club" onsubmit="enviarLeadClub(event)">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Tu Nombre y Apellido</label>
+                        <input type="text" id="lead-nombre" placeholder="Ej: Juan Pérez" required style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Nombre del Complejo Deportivo</label>
+                        <input type="text" id="lead-club" placeholder="Ej: Pádel Center" required style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Ciudad / Provincia</label>
+                            <input type="text" id="lead-ciudad" placeholder="Ej: Resistencia, Chaco" required style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Cantidad Canchas</label>
+                            <select id="lead-canchas" style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+                                <option value="1">1 a 2 canchas</option>
+                                <option value="3" selected>3 a 5 canchas</option>
+                                <option value="6">6 o más canchas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 18px;">
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">WhatsApp de Contacto</label>
+                        <input type="tel" id="lead-telefono" placeholder="Ej: 3624123456" required style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+                    </div>
+                    <button type="submit" id="btn-submit-lead" class="btn-software-clubes" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;">
+                        Activar 1 Mes Gratis &rarr;
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer-atc" style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 32px 20px;">
+        <p>&copy; 2026 SPORTGRID Clubes · Tecnología accesible para complejos deportivos de Argentina</p>
+        <div style="display: flex; gap: 20px; font-size: 0.84rem; flex-wrap: wrap; justify-content: center; align-items: center;">
+            <a href="/terminos" style="color: var(--text-muted); text-decoration: none;">Términos y Políticas</a>
+            <a href="/terminos#arrepentimiento" style="color: #ef4444; font-weight: 800; text-decoration: underline;">Botón de Arrepentimiento (Ley 24.240)</a>
+            <a href="/" style="color: var(--primary); font-weight: 800; text-decoration: none;">Buscador de Canchas</a>
+        </div>
+    </footer>
+
+    <!-- LÓGICA DE PRECIOS Y CALCULADORA -->
+    <script>
+        let modalidad = 'anual';
+
+        function setBilling(tipo) {
+            modalidad = tipo;
+            const btnMen = document.getElementById('btn-toggle-mensual');
+            const btnAnu = document.getElementById('btn-toggle-anual');
+
+            if (tipo === 'anual') {
+                btnAnu.style.background = 'var(--primary)';
+                btnAnu.style.color = 'white';
+                btnMen.style.background = 'transparent';
+                btnMen.style.color = 'var(--text-muted)';
+
+                document.getElementById('precio-base').innerText = '$32.000';
+                document.getElementById('tachado-base').style.display = 'block';
+                document.getElementById('anual-base').style.display = 'block';
+
+                document.getElementById('precio-std').innerText = '$54.000';
+                document.getElementById('tachado-std').style.display = 'block';
+                document.getElementById('anual-std').style.display = 'block';
+
+                document.getElementById('precio-full').innerText = '$85.000';
+                document.getElementById('tachado-full').style.display = 'block';
+                document.getElementById('anual-full').style.display = 'block';
+            } else {
+                btnMen.style.background = 'var(--primary)';
+                btnMen.style.color = 'white';
+                btnAnu.style.background = 'transparent';
+                btnAnu.style.color = 'var(--text-muted)';
+
+                document.getElementById('precio-base').innerText = '$40.000';
+                document.getElementById('tachado-base').style.display = 'none';
+                document.getElementById('anual-base').style.display = 'none';
+
+                document.getElementById('precio-std').innerText = '$68.000';
+                document.getElementById('tachado-std').style.display = 'none';
+                document.getElementById('anual-std').style.display = 'none';
+
+                document.getElementById('precio-full').innerText = '$106.000';
+                document.getElementById('tachado-full').style.display = 'none';
+                document.getElementById('anual-full').style.display = 'none';
+            }
+        }
+
+        function actualizarCalculadora() {
+            const canchas = document.getElementById('slider-canchas').value;
+            document.getElementById('val-canchas').innerText = canchas;
+            const extra = Number(canchas) * 60000;
+            document.getElementById('monto-recuperado').innerText = `+$${extra.toLocaleString('es-AR')} /mes`;
+        }
+
+        function toggleFaq(elem) {
+            const item = elem.parentElement;
+            const isOpen = item.classList.contains('active');
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+            if (!isOpen) {
+                item.classList.add('active');
+            }
+        }
+
+        async function enviarLeadClub(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-lead');
+            btn.disabled = true;
+            btn.innerText = 'Enviando...';
+
+            const payload = {
+                nombre: document.getElementById('lead-nombre').value,
+                nombre_club: document.getElementById('lead-club').value,
+                ciudad: document.getElementById('lead-ciudad').value,
+                canchas: Number(document.getElementById('lead-canchas').value),
+                telefono: document.getElementById('lead-telefono').value
+            };
+
+            try {
+                const res = await fetch('/api/leads-clubes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (window.mostrarToast) {
+                        mostrarToast('¡Solicitud enviada con éxito! Redirigiendo a WhatsApp...', 'success');
+                    } else {
+                        alert(data.mensaje);
+                    }
+                    const msgWa = encodeURIComponent(`Hola SportGrid! Soy ${payload.nombre} del complejo ${payload.nombre_club} (${payload.ciudad}). Me gustaría activar la prueba gratuita de 1 mes.`);
+                    setTimeout(() => {
+                        window.open(`https://wa.me/5493624000000?text=${msgWa}`, '_blank');
+                    }, 1200);
+                } else {
+                    alert(data.error || 'No se pudo registrar la solicitud');
+                }
+            } catch (err) {
+                alert('Error al conectar con el servidor.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Activar 1 Mes Gratis →';
+            }
+        }
+    </script>
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR PARA CELULARES (PWA MOBILE) -->
+    <nav class="mobile-bottom-bar" aria-label="Navegación Móvil">
+        <a href="/#buscar" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>Buscar</span>
+        </a>
+        <a href="/mis-reservas" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Mis Turnos</span>
+        </a>
+        <a href="/software" class="bottom-bar-item destacado-software">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-7L10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path></svg>
+            <span>Para Clubes</span>
+        </a>
+        <a href="/admin" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Panel Club</span>
+        </a>
+        {% if current_user.logged_in %}
+        <a href="/mis-reservas" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Mi Perfil</span>
+        </a>
+        {% else %}
+        <button type="button" class="bottom-bar-item" onclick="abrirModalAuth()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            <span>Ingresar</span>
+        </button>
+        {% endif %}
+    </nav>
+
+</body>
+</html>

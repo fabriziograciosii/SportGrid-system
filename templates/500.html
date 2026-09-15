@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error del Servidor (500) | SportGrid</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .error-page-wrapper {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .error-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 50px 36px;
+            max-width: 520px;
+            box-shadow: var(--shadow-sm);
+        }
+        .error-badge {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+        }
+        .error-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+        .error-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+        .error-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">SG</span>
+                <span class="logo-text">Sport<span>Grid</span></span>
+            </a>
+            <div class="nav-right">
+                <a href="/" class="btn-buscar-nav" style="text-decoration:none;">&larr; Volver al Inicio</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="error-page-wrapper">
+        <div class="error-card">
+            <div class="error-badge">⚠️ 🛠️</div>
+            <span style="font-size: 0.85rem; font-weight: 800; color: #dc2626; text-transform: uppercase; letter-spacing: 0.5px;">ERROR 500</span>
+            <h1 class="error-title">Inconveniente temporal</h1>
+            <p class="error-desc">
+                Ocurrió un error inesperado al procesar la solicitud. Nuestro equipo técnico ya fue notificado y está trabajando para solucionarlo.
+            </p>
+            <div class="error-actions">
+                <a href="/" class="btn-buscar-capsule" style="padding: 12px 24px; text-decoration: none;">
+                    <span>Reintentar en el Inicio</span>
+                </a>
+                <a href="https://wa.me/5493624000000?text=Hola,%20tuve%20un%20inconveniente%20en%20SportGrid" target="_blank" style="padding: 12px 20px; border-radius: var(--radius-full); font-weight: 700; color: #15803d; background: #dcfce7; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+                    Soporte por WhatsApp
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-sportgrid" style="padding: 24px 8%; text-align: center; font-size: 0.82rem; color: var(--text-muted);">
+        © 2026 SportGrid Argentina · Red de Gestión Deportiva
+    </footer>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Reservas | SPORTGRID Argentina</title>
+    <!-- PWA & Mobile Web App -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#005aff">
+    <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+    <style>
+        .reservas-container {
+            max-width: 1000px;
+            margin: 40px auto 70px;
+            padding: 0 24px;
+        }
+        .reservas-header {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .reservas-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+        .filtro-tel-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            border: 1.5px solid var(--border-color);
+        }
+        .filtro-tel-box input {
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--text-main);
+            width: 160px;
+        }
+        .tarjeta-reserva-jugador {
+            background: white;
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px 26px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tarjeta-reserva-jugador:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+        .reserva-info-left {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .reserva-club-nombre {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .reserva-meta {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .reserva-meta strong {
+            color: var(--text-main);
+        }
+        .reserva-badge-sena {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+        }
+        .reserva-badge-sena.mp {
+            background: #e0f2fe;
+            color: #0284c7;
+            border: 1px solid #bae6fd;
+        }
+        .reserva-badge-sena.club {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+        .reserva-acciones {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-cancelar-turno {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            padding: 8px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-cancelar-turno:hover {
+            background: #fca5a5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR UNIFICADA -->
+    <header class="navbar">
+        <a href="/" class="logo">
+            <span class="logo-sport">SPORT</span><span class="logo-grid">GRID</span>
+            <span class="nav-badge">ARGENTINA</span>
+        </a>
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="/mis-reservas" style="color: var(--primary); font-weight: 800;">Mis Reservas</a>
+            <div class="user-pill-nav" style="display: flex; align-items: center; gap: 8px; background: var(--bg-card-alt); border: 1.5px solid var(--border-color); padding: 5px 12px; border-radius: var(--radius-full);">
+                <span style="font-weight: 700; font-size: 0.86rem; color: var(--text-main);">👤 {{ current_user.nombre.split()[0] }}</span>
+                <a href="/logout" style="font-size: 0.78rem; color: #ef4444; text-decoration: none; font-weight: 700;">Salir</a>
+            </div>
+            <a href="/software" class="btn-software-clubes">Software para clubes</a>
+            <a href="/admin" class="btn-acceso-club">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>Administrar Club</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="reservas-container">
+        <div class="reservas-header">
+            <div>
+                <h1 class="reservas-title">Mis Reservas</h1>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">
+                    Hola, <strong>{{ current_user.nombre }}</strong>. Historial de tus turnos agendados, estados de señas y comprobantes activos.
+                </p>
+            </div>
+            <div class="filtro-tel-box">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                <input type="text" id="filtro-telefono" placeholder="Filtrar por tu WhatsApp..." oninput="cargarMisReservas()">
+            </div>
+        </div>
+
+        <!-- FICHA DE PERFIL DEPORTIVO (2 B) -->
+        <div style="background: white; border: 1.5px solid var(--border-color); border-radius: 16px; padding: 22px 26px; margin-bottom: 28px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #003db3 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 900; box-shadow: 0 4px 12px rgba(0,90,255,0.25);">
+                    {{ current_user.nombre[0] }}
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h2 style="font-size: 1.25rem; font-weight: 900; color: var(--text-main); margin: 0;">{{ current_user.nombre }}</h2>
+                        <span id="badge-reputacion" style="background: #ecfdf5; color: #047857; font-size: 0.76rem; font-weight: 800; padding: 3px 9px; border-radius: var(--radius-full); border: 1px solid #a7f3d0; display: inline-flex; align-items: center; gap: 4px;">
+                            ★ {{ current_user.reputacion }}% Asistencia · Jugador Cumplidor
+                        </span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px; flex-wrap: wrap; font-size: 0.86rem;">
+                        <span id="display-cat-padel" style="background: var(--primary-light); color: var(--primary); font-weight: 800; padding: 3px 9px; border-radius: 6px;">
+                            🎾 {{ current_user.categoria_padel }} ({{ current_user.posicion_padel }})
+                        </span>
+                        <span style="color: var(--text-muted); font-size: 0.82rem;">
+                            🏆 <strong>{{ current_user.partidos_jugados }}</strong> partidos jugados en SportGrid
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <button type="button" onclick="abrirModalEditarPerfil()" style="background: #f8fafc; border: 1.5px solid var(--border-color); padding: 9px 16px; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 800; color: var(--text-main); cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                <span>Editar Perfil Deportivo</span>
+            </button>
+        </div>
+
+        <!-- MODAL EDITAR PERFIL DEPORTIVO -->
+        <div id="modal-perfil-deportivo" class="modal-auth-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 16px; width: 90%; max-width: 440px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
+                    <h3 style="font-size: 1.1rem; font-weight: 800;">Mi Perfil Deportivo</h3>
+                    <button type="button" onclick="cerrarModalEditarPerfil()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">&times;</button>
+                </div>
+                <form id="form-perfil-deportivo" onsubmit="guardarPerfilDeportivo(event)" style="padding: 20px;">
+                    <div style="margin-bottom: 14px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Categoría de Pádel</label>
+                        <select id="input-perfil-cat" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-weight: 700;">
+                            <option value="8va Categoría">8va Categoría (Iniciación)</option>
+                            <option value="7ma Categoría" selected>7ma Categoría (Principiante / Intermedio)</option>
+                            <option value="6ta Categoría">6ta Categoría (Intermedio)</option>
+                            <option value="5ta Categoría">5ta Categoría (Avanzado)</option>
+                            <option value="4ta Categoría">4ta Categoría (Primera / Competitivo)</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Posición en Pádel</label>
+                            <select id="input-perfil-pos" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                <option value="Drive" selected>Drive (Derecha)</option>
+                                <option value="Revés">Revés (Izquierda)</option>
+                                <option value="Ambos lados">Ambos lados</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Mano Hábil</label>
+                            <select id="input-perfil-mano" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                <option value="Derecha" selected>Diestro</option>
+                                <option value="Zurda">Zurdo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:4px;">Nivel de Fútbol 5</label>
+                        <select id="input-perfil-futbol" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <option value="Recreativo">Recreativo / Tercer tiempo</option>
+                            <option value="Intermedio" selected>Intermedio</option>
+                            <option value="Competitivo">Competitivo / Torneos</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" onclick="cerrarModalEditarPerfil()" style="padding: 8px 14px; border: none; background: #f1f5f9; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
+                        <button type="submit" style="padding: 8px 18px; border: none; background: var(--primary); color: white; border-radius: 6px; font-weight: 800; cursor: pointer;">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="lista-mis-reservas">
+            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                Cargando tus reservas...
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarMisReservas();
+        });
+
+        async function cargarMisReservas() {
+            const tel = document.getElementById('filtro-telefono').value.trim();
+            const container = document.getElementById('lista-mis-reservas');
+            
+            let url = '/api/reservas';
+            if (tel) {
+                url += `?telefono=${encodeURIComponent(tel)}`;
+            }
+
+            try {
+                const res = await fetch(url);
+                const reservas = await res.json();
+
+                if (reservas.length === 0) {
+                    container.innerHTML = `
+                        <div style="background: white; border: 1.5px solid var(--border-color); border-radius: 18px; padding: 50px 20px; text-align: center;">
+                            <div style="font-size: 2.5rem; margin-bottom: 12px;">🎾</div>
+                            <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">
+                                No tenés reservas registradas
+                            </h3>
+                            <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 20px;">
+                                Buscá tu complejo favorito y reservá tu cancha al instante.
+                            </p>
+                            <a href="/" style="background: var(--primary); color: white; padding: 10px 22px; border-radius: var(--radius-full); text-decoration: none; font-weight: 800; font-size: 0.9rem;">
+                                Explorar Canchas &rarr;
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = reservas.map(r => {
+                    const esMP = r.metodo_pago === 'Mercado Pago';
+                    const badgeClass = esMP ? 'mp' : 'club';
+                    const badgeText = esMP ? `Seña Pagada ($${(r.monto_sena || 8000).toLocaleString('es-AR')}) ✓ MP` : 'Pago pendiente en complejo';
+                    
+                    const msgWhatsApp = encodeURIComponent(
+                        `Hola! Tengo una consulta sobre mi reserva ${r.codigo_reserva} en ${r.nombre_club} para el día ${r.fecha} a las ${r.hora_inicio} hs.`
+                    );
+                    const linkWa = `https://wa.me/549${(r.club_telefono || '3624000000').replace(/\\D/g, '')}?text=${msgWhatsApp}`;
+
+                    return `
+                        <div class="tarjeta-reserva-jugador">
+                            <div class="reserva-info-left">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span class="reserva-club-nombre">${r.nombre_club}</span>
+                                    <span class="reserva-badge-sena ${badgeClass}">${badgeText}</span>
+                                </div>
+                                <div class="reserva-meta">
+                                    <span>📍 ${r.cancha_nombre} (${r.nombre_deporte})</span>
+                                    <span>•</span>
+                                    <span>🗓️ <strong>${r.fecha}</strong></span>
+                                    <span>•</span>
+                                    <span>⏰ <strong>${r.hora_inicio} a ${r.hora_fin} hs</strong></span>
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                                    Titular: <strong>${r.titular_nombre}</strong> (${r.titular_telefono}) · Código: <strong style="color:var(--primary);">${r.codigo_reserva}</strong>
+                                </div>
+                            </div>
+
+                            <div class="reserva-acciones">
+                                <a href="${linkWa}" target="_blank" class="btn-whatsapp-accion" style="padding: 8px 14px; font-size: 0.8rem;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                    <span>WhatsApp Club</span>
+                                </a>
+                                <button type="button" class="btn-cancelar-turno" onclick="cancelarMiReserva(${r.id_reserva}, '${r.codigo_reserva}')">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                container.innerHTML = `<div style="color: red; text-align: center;">Error al cargar las reservas.</div>`;
+            }
+        }
+
+        async function cancelarMiReserva(idReserva, codigo) {
+            if (!confirm(`¿Estás seguro de cancelar tu reserva ${codigo}?`)) return;
+
+            try {
+                const res = await fetch(`/api/reservas/${idReserva}/cancelar`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Reserva cancelada con éxito.');
+                    cargarMisReservas();
+                } else {
+                    alert(data.error || 'No se pudo cancelar la reserva.');
+                }
+            } catch (e) {
+                alert('Error de conexión al cancelar.');
+            }
+        }
+
+        function abrirModalEditarPerfil() {
+            document.getElementById('modal-perfil-deportivo').style.display = 'flex';
+        }
+
+        function cerrarModalEditarPerfil() {
+            document.getElementById('modal-perfil-deportivo').style.display = 'none';
+        }
+
+        async function guardarPerfilDeportivo(e) {
+            e.preventDefault();
+            const payload = {
+                categoria_padel: document.getElementById('input-perfil-cat').value,
+                posicion_padel: document.getElementById('input-perfil-pos').value,
+                mano_habil: document.getElementById('input-perfil-mano').value,
+                categoria_futbol: document.getElementById('input-perfil-futbol').value
+            };
+            try {
+                const res = await fetch('/api/usuario/perfil', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (window.mostrarToast) mostrarToast('¡Perfil deportivo actualizado!', 'success');
+                    else alert('¡Perfil deportivo actualizado!');
+                    document.getElementById('display-cat-padel').innerText = `🎾 ${payload.categoria_padel} (${payload.posicion_padel})`;
+                    cerrarModalEditarPerfil();
+                } else {
+                    alert(data.error || 'No se pudo actualizar');
+                }
+            } catch (err) {
+                alert('Error al conectar con el servidor.');
+            }
+        }
+    </script>
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR PARA CELULARES (PWA MOBILE) -->
+    <nav class="mobile-bottom-bar" aria-label="Navegación Móvil">
+        <a href="/#buscar" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>Buscar</span>
+        </a>
+        <a href="/mis-reservas" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Mis Turnos</span>
+        </a>
+        <a href="/software" class="bottom-bar-item destacado-software">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-7L10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path></svg>
+            <span>Para Clubes</span>
+        </a>
+        <a href="/admin" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Panel Club</span>
+        </a>
+        {% if current_user.logged_in %}
+        <a href="/mis-reservas" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Mi Perfil</span>
+        </a>
+        {% else %}
+        <button type="button" class="bottom-bar-item" onclick="abrirModalAuth()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            <span>Ingresar</span>
+        </button>
+        {% endif %}
+    </nav>
+
+</body>
+</html>

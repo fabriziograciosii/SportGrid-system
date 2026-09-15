@@ -3,281 +3,1971 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva tu Cancha | SPORTGRID</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        body {
-            background-color: #f8f9fa;
-            color: #212529;
-        }
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 8%;
-            background: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #00a45b;
-            text-decoration: none;
-        }
-        .nav-links a {
-            text-decoration: none;
-            color: #495057;
-            margin-left: 20px;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        .nav-links a.btn-login {
-            background: #00a45b;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-        }
+    <title>SPORTGRID | Encontrá y reservá tu cancha al instante</title>
+    <meta name="description" content="La red deportiva de Argentina. Encontrá y reservá canchas de pádel, fútbol y tenis en tiempo real con señas seguras y matchmaking ¿Falta Uno?.">
+    <!-- PWA & Mobile Web App -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#005aff">
+    <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
+    <!-- Open Graph / Redes Sociales & WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SportGrid Argentina">
+    <meta property="og:title" content="SPORTGRID | Encontrá y reservá tu cancha al instante">
+    <meta property="og:description" content="Turnos en tiempo real, señas automáticas por Mercado Pago y partidos abiertos en Argentina.">
+    <meta property="og:image" content="/static/icon.svg">
+    <meta property="og:url" content="https://sportgrid.com.ar">
 
-        .hero {
-            background: linear-gradient(135deg, #00a45b 0%, #007a43 100%);
-            color: white;
-            text-align: center;
-            padding: 80px 20px;
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+        function seleccionarDeporteRapido(dep) {
+            const sel = document.getElementById('buscador-deporte');
+            if (sel) {
+                sel.value = dep;
+                ejecutarBusqueda(new Event('submit'));
+            }
         }
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+    </script>
+    <script src="{{ url_for('static', filename='js/toast.js') }}">
+        function seleccionarDeporteRapido(dep) {
+            const sel = document.getElementById('buscador-deporte');
+            if (sel) {
+                sel.value = dep;
+                ejecutarBusqueda(new Event('submit'));
+            }
         }
-        .hero p {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            opacity: 0.9;
-        }
-        
-        .search-box {
-            background: white;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 15px;
-            align-items: center;
-        }
-        .search-field {
-            text-align: left;
-        }
-        .search-field label {
-            display: block;
-            font-size: 0.8rem;
-            color: #6c757d;
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        .search-field select, .search-field input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            outline: none;
-        }
-        .btn-buscar {
-            background: #00a45b;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            height: 100%;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 50px auto;
-            padding: 0 20px;
-        }
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .grilla-canchas {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .cancha-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-left: 5px solid #00a45b;
-        }
-        .cancha-titulo {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .cancha-desc {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 15px;
-        }
-        .btn-reservar {
-            display: inline-block;
-            background: #e6f4ed;
-            color: #00a45b;
-            text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            border: none;
-            cursor: pointer;
-        }
-        
-        /* NUEVO: Estilos para la botonera de turnos */
-        .horarios-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 15px;
-        }
-        .btn-turno {
-            background: white;
-            border: 1px solid #00a45b;
-            color: #00a45b;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-turno:hover {
-            background: #00a45b;
-            color: white;
-        }
-    </style>
+    </script>
 </head>
 <body>
 
+    <!-- 1. NAVBAR SPORTGRID -->
     <header class="navbar">
-        <a href="#" class="logo">SPORTGRID </a>
-        <div class="nav-links">
-            <a href="#">Registrar Club</a>
-            <a href="#" class="btn-login">Ingresar</a>
-        </div>
+        <a href="/" class="logo">
+            <span class="logo-sport">SPORT</span><span class="logo-grid">GRID</span>
+            <span class="nav-badge">ARGENTINA</span>
+        </a>
+        <nav class="nav-links">
+            {% if current_user.logged_in %}
+                <a href="/mis-reservas" style="color: var(--primary); font-weight: 800; text-decoration: none; font-size: 0.95rem;">Mis Reservas</a>
+                <div class="user-pill-nav" style="display: flex; align-items: center; gap: 8px; background: var(--bg-card-alt); border: 1.5px solid var(--border-color); padding: 5px 12px; border-radius: var(--radius-full);">
+                    <span style="font-weight: 700; font-size: 0.86rem; color: var(--text-main);">👤 {{ current_user.nombre.split()[0] }}</span>
+                    <a href="/logout" style="font-size: 0.78rem; color: #ef4444; text-decoration: none; font-weight: 700;">Salir</a>
+                </div>
+            {% else %}
+                <button type="button" class="btn-iniciar-sesion" onclick="abrirModalAuth()">Iniciar sesión</button>
+            {% endif %}
+            <a href="/software" class="btn-software-clubes">Software para clubes</a>
+            <a href="/admin" class="btn-acceso-club">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>Administrar Club</span>
+            </a>
+        </nav>
     </header>
 
-    <section class="hero">
-        <h1>Encontrá y reservá tu cancha al instante</h1>
-        <p>La red más grande de complejos deportivos en un solo lugar.</p>
-        
-        <div class="search-box">
-            <div class="search-field">
-                <label>Deporte</label>
-                <select id="filtro-deporte">
-                    <option value="1">Pádel</option>
-                    <option value="2">Fútbol 5</option>
-                </select>
-            </div>
-            <div class="search-field">
-                <label>Ciudad</label>
-                <select id="filtro-ciudad">
-                    <option value="corrientes">Corrientes</option>
-                    <option value="resistencia">Resistencia</option>
-                </select>
-            </div>
-            <div class="search-field">
-                <label>Fecha</label>
-                <input type="date" id="filtro-fecha">
-            </div>
-            <button class="btn-buscar">Buscar</button>
+    <!-- 2. HERO PRINCIPAL -->
+    <section class="hero-atc">
+        <div class="hero-content">
+            <span class="hero-tagline">Red Deportiva de Argentina</span>
+            <h1 class="hero-title">
+                Tu cancha reservada al instante,<br>
+                <span class="color-destacado">en un solo lugar.</span>
+            </h1>
+            <p class="hero-subtitle">
+                Buscá canchas disponibles en tiempo real en todo el país. Elegí turnos de 60 o 90 minutos y dividí el pago automáticamente entre los jugadores.
+            </p>
         </div>
     </section>
 
-    <main class="container">
-        <div class="section-title">Instalaciones Disponibles</div>
-        <div id="contenedor-canchas" class="grilla-canchas">
-            <p>Cargando disponibilidad...</p>
-        </div>
-    </main>
+    <!-- 3. BUSCADOR MULTIDEPORTE (CÁPSULA CON ICONOS VECTORIALES SVG) -->
+    <section class="search-capsule-wrapper" id="buscar">
+        
+            <!-- PÍLDORAS RÁPIDAS DEPORTIVAS PARA CELULAR (1 TOQUE) -->
+            <div style="display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 12px; padding: 2px 0;">
+                <button type="button" onclick="seleccionarDeporteRapido('Pádel')" style="background: white; border: 1.5px solid var(--border-color); border-radius: 9999px; padding: 6px 14px; font-size: 0.8rem; font-weight: 800; color: var(--text-main); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                    <span>🎾 Pádel</span>
+                </button>
+                <button type="button" onclick="seleccionarDeporteRapido('Fútbol 5')" style="background: white; border: 1.5px solid var(--border-color); border-radius: 9999px; padding: 6px 14px; font-size: 0.8rem; font-weight: 800; color: var(--text-main); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                    <span>⚽ Fútbol 5</span>
+                </button>
+                <button type="button" onclick="seleccionarDeporteRapido('Tenis')" style="background: white; border: 1.5px solid var(--border-color); border-radius: 9999px; padding: 6px 14px; font-size: 0.8rem; font-weight: 800; color: var(--text-main); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                    <span>🎾 Tenis</span>
+                </button>
+                <button type="button" onclick="activarGeolocalizacion(event)" style="background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: 9999px; padding: 6px 14px; font-size: 0.8rem; font-weight: 800; color: var(--primary); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path></svg>
+                    <span>Cerca de mí</span>
+                </button>
+            </div>
 
-    <script>
-        async function cargarCanchas() {
-            try {
-                const respuesta = await fetch('/api/canchas');
-                const canchas = await respuesta.json();
-                
-                const contenedor = document.getElementById('contenedor-canchas');
-                contenedor.innerHTML = ''; 
-
-                canchas.forEach(cancha => {
-                    const tarjeta = document.createElement('div');
-                    tarjeta.className = 'cancha-card';
-                    
-                    // Al hacer clic, ahora llamamos a la función mostrarHorarios y le pasamos el ID de la cancha
-                    tarjeta.innerHTML = `
-                        <div class="cancha-titulo">${cancha.nombre_interno}</div>
-                        <div class="cancha-desc">${cancha.caracteristicas}</div>
-                        <button class="btn-reservar" onclick="mostrarHorarios(${cancha.id_instalacion})">Ver Horarios &rarr;</button>
-                        
-                        <!-- Acá adentro se van a dibujar los botones de las horas -->
-                        <div id="horarios-${cancha.id_instalacion}" class="horarios-container"></div>
-                    `;
-                    contenedor.appendChild(tarjeta);
-                });
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        // NUEVO: Función que va a buscar los turnos a la API cuando hacés clic
-        async function mostrarHorarios(idCancha) {
-            const contenedor = document.getElementById(`horarios-${idCancha}`);
+        <form class="search-capsule" id="form-buscador-sportgrid" onsubmit="ejecutarBusqueda(event)">
             
-            // Si los horarios ya están visibles y volvés a tocar el botón, los cerramos (efecto acordeón)
-            if (contenedor.innerHTML !== '') {
-                contenedor.innerHTML = '';
-                return;
-            }
+            <!-- Item 1: Ciudad -->
+            <div class="search-item">
+                <span class="search-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                </span>
+                <div class="search-select-wrapper">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                        <span class="search-label" style="margin-bottom: 0;">Ciudad</span>
+                        <button type="button" class="btn-cerca-gps" id="btn-cerca-gps" onclick="activarGeolocalizacion(event)" title="Buscar canchas cerca de mi ubicación GPS">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path></svg>
+                            <span id="texto-cerca-gps">Cerca de mí</span>
+                        </button>
+                    </div>
+                    <input type="text" id="buscador-ciudad" list="ciudades-argentina" class="search-input-field" placeholder="¿Dónde querés jugar? (ej. Resistencia)" value="" autocomplete="off">
+                    <datalist id="ciudades-argentina">
+                        <option value="Resistencia">Chaco</option>
+                        <option value="Corrientes">Corrientes</option>
+                        <option value="Buenos Aires">CABA / Gran Buenos Aires</option>
+                        <option value="Córdoba">Córdoba</option>
+                        <option value="Rosario">Santa Fe</option>
+                        <option value="Mendoza">Mendoza</option>
+                        <option value="San Miguel de Tucumán">Tucumán</option>
+                        <option value="Salta">Salta</option>
+                        <option value="Santa Fe">Santa Fe</option>
+                        <option value="Mar del Plata">Buenos Aires</option>
+                        <option value="La Plata">Buenos Aires</option>
+                        <option value="Posadas">Misiones</option>
+                        <option value="Formosa">Formosa</option>
+                        <option value="Neuquén">Neuquén</option>
+                        <option value="San Juan">San Juan</option>
+                        <option value="San Salvador de Jujuy">Jujuy</option>
+                        <option value="Santiago del Estero">Santiago del Estero</option>
+                        <option value="Paraná">Entre Ríos</option>
+                        <option value="Bahía Blanca">Buenos Aires</option>
+                        <option value="San Luis">San Luis</option>
+                        <option value="San Fernando del Valle de Catamarca">Catamarca</option>
+                        <option value="La Rioja">La Rioja</option>
+                        <option value="Santa Rosa">La Pampa</option>
+                        <option value="San Carlos de Bariloche">Río Negro</option>
+                        <option value="Comodoro Rivadavia">Chubut</option>
+                        <option value="Río Gallegos">Santa Cruz</option>
+                        <option value="Ushuaia">Tierra del Fuego</option>
+                        <option value="Puerto Madryn">Chubut</option>
+                        <option value="Tandil">Buenos Aires</option>
+                        <option value="Rafaela">Santa Fe</option>
+                        <option value="Río Cuarto">Córdoba</option>
+                        <option value="Villa Carlos Paz">Córdoba</option>
+                        <option value="Concordia">Entre Ríos</option>
+                        <option value="Goya">Corrientes</option>
+                        <option value="Presidencia Roque Sáenz Peña">Chaco</option>
+                        <option value="Paso de los Libres">Corrientes</option>
+                        <option value="Oberá">Misiones</option>
+                    </datalist>
+                </div>
+            </div>
 
-            contenedor.innerHTML = '<span style="font-size: 12px; color: gray;">Calculando turnos...</span>';
+            <!-- Item 2: Deporte -->
+            <div class="search-item">
+                <span class="search-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 2a14.5 14.5 0 0 0 0 20M2 12h20"></path>
+                    </svg>
+                </span>
+                <div class="search-select-wrapper">
+                    <span class="search-label">Deporte</span>
+                    <select id="buscador-deporte" class="search-input-field">
+                        <option value="todos" selected>Todos los deportes</option>
+                        <optgroup label="Pádel & Raqueta">
+                            <option value="Pádel">Pádel</option>
+                            <option value="Tenis">Tenis</option>
+                            <option value="Squash">Squash</option>
+                        </optgroup>
+                        <optgroup label="Fútbol">
+                            <option value="Fútbol 5">Fútbol 5</option>
+                            <option value="Fútbol 7">Fútbol 7</option>
+                            <option value="Fútbol 11">Fútbol 11</option>
+                        </optgroup>
+                        <optgroup label="Otros">
+                            <option value="Básquet">Básquet</option>
+                            <option value="Hockey">Hockey</option>
+                            <option value="Natación">Natación</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
 
-            try {
-                const respuesta = await fetch(`/api/horarios/${idCancha}`);
-                const horarios = await respuesta.json();
-                
-                contenedor.innerHTML = ''; // Limpiamos el texto de carga
+            <!-- Item 3: Fecha -->
+            <div class="search-item">
+                <span class="search-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </span>
+                <div class="search-select-wrapper">
+                    <span class="search-label">Fecha</span>
+                    <select id="buscador-fecha" class="search-input-field">
+                        <option value="todas" selected>Cualquier fecha</option>
+                    </select>
+                </div>
+            </div>
 
-                // Por cada hora, creamos un botoncito verde
-                horarios.forEach(hora => {
-                    const btnTurno = document.createElement('button');
-                    btnTurno.className = 'btn-turno';
-                    btnTurno.innerText = hora;
-                    // Cuando toquemos la hora, podríamos disparar la lógica de reserva final
-                    btnTurno.onclick = () => alert(`Iniciando reserva para las ${hora} en la cancha ID: ${idCancha}`);
+            <!-- Item 4: Horario (de 08 a 00 hs) -->
+            <div class="search-item">
+                <span class="search-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </span>
+                <div class="search-select-wrapper">
+                    <span class="search-label">Horario</span>
+                    <select id="buscador-hora" class="search-input-field">
+                        <option value="todos" selected>Cualquier horario</option>
+                        <option value="08:00">08:00 hs</option>
+                        <option value="09:00">09:00 hs</option>
+                        <option value="10:00">10:00 hs</option>
+                        <option value="11:00">11:00 hs</option>
+                        <option value="12:00">12:00 hs</option>
+                        <option value="13:00">13:00 hs</option>
+                        <option value="14:00">14:00 hs</option>
+                        <option value="15:00">15:00 hs</option>
+                        <option value="16:00">16:00 hs</option>
+                        <option value="17:00">17:00 hs</option>
+                        <option value="18:00">18:00 hs</option>
+                        <option value="19:00">19:00 hs</option>
+                        <option value="20:00">20:00 hs</option>
+                        <option value="21:00">21:00 hs</option>
+                        <option value="22:00">22:00 hs</option>
+                        <option value="23:00">23:00 hs</option>
+                        <option value="00:00">00:00 hs</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Item 5: Duración -->
+            <div class="search-item">
+                <span class="search-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 8 14"></polyline>
+                    </svg>
+                </span>
+                <div class="search-select-wrapper">
+                    <span class="search-label">Duración</span>
+                    <select id="buscador-duracion" class="search-input-field">
+                        <option value="todas" selected>Cualquier duración</option>
+                        <option value="60">60 minutos</option>
+                        <option value="90">90 minutos</option>
+                        <option value="120">120 minutos</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botón Buscar -->
+            <div>
+                <button type="submit" class="btn-buscar-capsule">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span>Buscar</span>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- 4. SECCIÓN DINÁMICA DE RESULTADOS DE BÚSQUEDA (Desplegable Estilo ATC) -->
+    <section id="seccion-resultados" style="display: none; padding: 40px 8% 30px;">
+        
+        <!-- BARRA DE FILTROS SECUNDARIOS (ESTILO ATC PREMIUM CON MULTI-SELECCIÓN) -->
+        <div class="filter-bar-atc" id="barra-filtros-atc">
+            <div class="filter-pills-group">
+                <!-- 1. Búsqueda rápida por nombre -->
+                <div class="filter-search-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="filtro-nombre-club" placeholder="Buscar club..." oninput="filtrarResultados()">
+                </div>
+
+                <!-- 2. Ordenar (Dropdown) -->
+                <div class="custom-dropdown" id="dropdown-orden">
+                    <button type="button" class="filter-btn-pill" onclick="toggleDropdown('dropdown-orden')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 15 12 20 17 15"></polyline><polyline points="17 9 12 4 7 9"></polyline></svg>
+                        <span id="label-orden">Ordenar</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="dropdown-menu-popover">
+                        <div class="dropdown-menu-header">
+                            <span class="dropdown-menu-title">Ordenar por</span>
+                        </div>
+                        <div class="dropdown-options-list">
+                            <label class="dropdown-option-radio">
+                                <input type="radio" name="radio-orden" value="recomendados" checked onchange="cambiarOrden('recomendados', 'Ordenar: Recomendados')">
+                                <span>Recomendados</span>
+                            </label>
+                            <label class="dropdown-option-radio">
+                                <input type="radio" name="radio-orden" value="cercania" onchange="cambiarOrden('cercania', 'Más cercanos')">
+                                <span>📍 Más cercanos (distancia)</span>
+                            </label>
+                            <label class="dropdown-option-radio">
+                                <input type="radio" name="radio-orden" value="precio-menor" onchange="cambiarOrden('precio-menor', 'Menor precio')">
+                                <span>Menor precio</span>
+                            </label>
+                            <label class="dropdown-option-radio">
+                                <input type="radio" name="radio-orden" value="precio-mayor" onchange="cambiarOrden('precio-mayor', 'Mayor precio')">
+                                <span>Mayor precio</span>
+                            </label>
+                            <label class="dropdown-option-radio">
+                                <input type="radio" name="radio-orden" value="canchas-mas" onchange="cambiarOrden('canchas-mas', 'Más canchas')">
+                                <span>Más canchas</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Superficie (Multi-select) -->
+                <div class="custom-dropdown" id="dropdown-superficie">
+                    <button type="button" class="filter-btn-pill" id="btn-pill-superficie" onclick="toggleDropdown('dropdown-superficie')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        <span id="label-superficie">Superficie</span>
+                        <span class="pill-badge" id="badge-superficie" style="display:none;">0</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="dropdown-menu-popover">
+                        <div class="dropdown-menu-header">
+                            <span class="dropdown-menu-title">Tipo de superficie</span>
+                            <button type="button" class="btn-clear-dropdown" onclick="limpiarGrupoMulti('superficie')">Limpiar</button>
+                        </div>
+                        <div class="dropdown-options-list">
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-superficie" value="Cristal" onchange="actualizarFiltrosMulti('superficie')">
+                                <span>Cristal / Panorámica</span>
+                            </label>
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-superficie" value="Césped sintético" onchange="actualizarFiltrosMulti('superficie')">
+                                <span>Césped sintético</span>
+                            </label>
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-superficie" value="Polvo de ladrillo" onchange="actualizarFiltrosMulti('superficie')">
+                                <span>Polvo de ladrillo</span>
+                            </label>
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-superficie" value="Cemento" onchange="actualizarFiltrosMulti('superficie')">
+                                <span>Cemento / Rápida</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Duración (Dropdown) -->
+                <div class="custom-dropdown" id="dropdown-duracion">
+                    <button type="button" class="filter-btn-pill" id="btn-pill-duracion" onclick="toggleDropdown('dropdown-duracion')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span id="label-duracion">Duración</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="dropdown-menu-popover">
+                        <div class="dropdown-menu-header">
+                            <span class="dropdown-menu-title">Duración del turno</span>
+                        </div>
+                        <div class="dropdown-options-list">
+                            <label class="dropdown-option-radio">
+                                <input type="radio" name="radio-duracion" value="todas" checked onchange="cambiarDuracionTurno('todas')">
+                                <span>Cualquier duración</span>
+                            </label>
+                            <label class="dropdown-option-radio">
+                                <input type="radio" name="radio-duracion" value="60" onchange="cambiarDuracionTurno('60')">
+                                <span>60 minutos</span>
+                            </label>
+                            <label class="dropdown-option-radio">
+                                <input type="radio" name="radio-duracion" value="90" onchange="cambiarDuracionTurno('90')">
+                                <span>90 minutos</span>
+                            </label>
+                            <label class="dropdown-option-radio">
+                                <input type="radio" name="radio-duracion" value="120" onchange="cambiarDuracionTurno('120')">
+                                <span>120 minutos</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Servicios del club (Multi-select) -->
+                <div class="custom-dropdown" id="dropdown-servicios">
+                    <button type="button" class="filter-btn-pill" id="btn-pill-servicios" onclick="toggleDropdown('dropdown-servicios')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path><path d="M9 9v.01"></path><path d="M9 12v.01"></path><path d="M9 15v.01"></path><path d="M9 18v.01"></path></svg>
+                        <span id="label-servicios">Servicios del club</span>
+                        <span class="pill-badge" id="badge-servicios" style="display:none;">0</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="dropdown-menu-popover">
+                        <div class="dropdown-menu-header">
+                            <span class="dropdown-menu-title">Servicios del club</span>
+                            <button type="button" class="btn-clear-dropdown" onclick="limpiarGrupoMulti('servicios')">Limpiar</button>
+                        </div>
+                        <div class="dropdown-options-list">
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-servicios" value="Cantina" onchange="actualizarFiltrosMulti('servicios')">
+                                <span>Con Cantina / Bar</span>
+                            </label>
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-servicios" value="Estacionamiento" onchange="actualizarFiltrosMulti('servicios')">
+                                <span>Con Estacionamiento</span>
+                            </label>
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-servicios" value="Vestuarios" onchange="actualizarFiltrosMulti('servicios')">
+                                <span>Con Vestuarios</span>
+                            </label>
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-servicios" value="Iluminación LED" onchange="actualizarFiltrosMulti('servicios')">
+                                <span>Iluminación LED</span>
+                            </label>
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-servicios" value="WiFi" onchange="actualizarFiltrosMulti('servicios')">
+                                <span>Con WiFi</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Cerramiento (Multi-select) -->
+                <div class="custom-dropdown" id="dropdown-cerramiento">
+                    <button type="button" class="filter-btn-pill" id="btn-pill-cerramiento" onclick="toggleDropdown('dropdown-cerramiento')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                        <span id="label-cerramiento">Cerramiento</span>
+                        <span class="pill-badge" id="badge-cerramiento" style="display:none;">0</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="dropdown-menu-popover">
+                        <div class="dropdown-menu-header">
+                            <span class="dropdown-menu-title">Cerramiento</span>
+                            <button type="button" class="btn-clear-dropdown" onclick="limpiarGrupoMulti('cerramiento')">Limpiar</button>
+                        </div>
+                        <div class="dropdown-options-list">
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-cerramiento" value="Techada" onchange="actualizarFiltrosMulti('cerramiento')">
+                                <span>Techada / Cubierta</span>
+                            </label>
+                            <label class="dropdown-option-item">
+                                <input type="checkbox" name="chk-cerramiento" value="Al aire libre" onchange="actualizarFiltrosMulti('cerramiento')">
+                                <span>Al aire libre</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Limpiar Todos los Filtros -->
+                <button type="button" id="btn-reset-todos-filtros" class="filter-btn-pill" style="display: none; color: #ef4444; border-color: #fca5a5; background: #fef2f2;" onclick="restablecerTodosLosFiltros()">
+                    ✕ Borrar filtros
+                </button>
+            </div>
+
+            <!-- Mostrar el mapa (Toggle Switch) -->
+            <label class="toggle-mapa-container">
+                <span>Mostrar el mapa</span>
+                <div class="switch-toggle">
+                    <input type="checkbox" id="toggle-mapa" onchange="toggleVistaMapa(this.checked)">
+                    <span class="slider-round"></span>
+                </div>
+            </label>
+        </div>
+
+        <!-- CONTADOR Y UBICACIÓN ESTILO ATC -->
+        <div class="results-header-atc">
+            <h2 class="results-count-headline" id="titulo-resultados">
+                Cargando complejos...
+            </h2>
+        </div>
+
+        <!-- MAPA INTERACTIVO (Se despliega con el switch) -->
+        <div class="map-view-wrapper" id="mapa-wrapper">
+            <div id="mapa-interactivo" style="width: 100%; height: 360px;"></div>
+        </div>
+
+        <!-- SECCIÓN TURNOS LIBERADOS DE ÚLTIMO MINUTO CON DESCUENTO (Solo visible al buscar si hay ofertas) -->
+        <div id="turnos-oferta" style="display: none; margin-bottom: 28px; padding: 24px; background: #fff5f5; border: 1.5px solid #fee2e2; border-radius: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <span style="color: #e11d48; font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">ALERTA ÚLTIMO MINUTO</span>
+                    <h3 style="font-size: 1.35rem; font-weight: 900; color: #881337; margin-top: 2px;">
+                        🔥 Turnos liberados <span style="color: #e11d48;">con descuento en tu zona</span>
+                    </h3>
+                </div>
+            </div>
+            <div id="grilla-turnos-ofertas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+            </div>
+        </div>
+
+        <!-- GRILLA DE TARJETAS ESTILO ATC -->
+        <div class="grilla-clubes" id="grilla-resultados"></div>
+    </section>
+
+    <!-- SECCIÓN MATCHMAKING "¿FALTA UNO? / PARTIDOS ABIERTOS" -->
+    <section class="seccion-partidos-abiertos" id="partidos-abiertos" style="padding: 60px 8%; background: white; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <span style="color: var(--primary); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">MATCHMAKING COMUNITARIO</span>
+                    <h2 style="font-size: 2rem; font-weight: 900; color: var(--text-main); margin-top: 4px; letter-spacing: -0.5px;">
+                        ¿Falta Uno? <span style="color: var(--primary);">Sumate a un partido</span>
+                    </h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">
+                        Partidos incompletos en tu zona. Sumate con un clic o completá tu equipo en segundos.
+                    </p>
+                </div>
+                <div>
+                    <button type="button" onclick="abrirModalCrearPartido()" class="btn-buscar-capsule" style="padding: 10px 22px; font-size: 0.9rem;">
+                        <span>+ Publicar Partido Abierto</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grilla de Partidos Abiertos -->
+            <div id="grilla-partidos-abiertos" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                <div style="text-align: center; color: var(--text-muted); padding: 40px;">Cargando partidos disponibles...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. SECCIÓN 1: AUTOMATIZACIÓN DE RESERVAS (Basado en imagen 1) -->
+    <section class="section-showcase" id="automatizacion">
+        <div class="showcase-container">
+            <!-- Mockup Celular -->
+            <div class="phone-mockup-wrapper">
+                <div class="phone-mockup-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="phone-inner-content">
+                            <div class="phone-app-header">
+                                <div style="font-size: 0.85rem; font-weight: 900; color: var(--text-main);">
+                                    <span style="color: var(--text-main);">SPORT</span><span style="color: var(--primary);">GRID</span>
+                                </div>
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800;">US</div>
+                            </div>
+                            
+                            <div style="font-size: 1.15rem; font-weight: 900; line-height: 1.2; margin-bottom: 4px; color: var(--text-main);">
+                                Reservá tu cancha al instante
+                            </div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;">
+                                Disponibilidad en vivo en Resistencia
+                            </div>
+
+                            <!-- Tarjeta de Cancha en Mockup -->
+                            <div class="phone-card-court">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <strong style="font-size: 0.82rem; color: var(--text-main);">Punto Norte · Cancha 1</strong>
+                                    <span style="background: var(--accent-light); color: var(--accent); font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px;">Libre</span>
+                                </div>
+                                <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">Pádel Cristal · 90 min</div>
+                                <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                                    <span style="background: var(--primary-light); color: var(--primary); font-size: 0.68rem; font-weight: 800; padding: 4px 8px; border-radius: 4px;">18:00 hs</span>
+                                    <span style="background: #f1f5f9; color: var(--text-muted); font-size: 0.68rem; font-weight: 600; padding: 4px 8px; border-radius: 4px;">19:00 hs</span>
+                                    <span style="background: #f1f5f9; color: var(--text-muted); font-size: 0.68rem; font-weight: 600; padding: 4px 8px; border-radius: 4px;">21:00 hs</span>
+                                </div>
+                                <div style="background: #fafafa; border: 1px dashed var(--border-color); border-radius: 6px; padding: 6px; font-size: 0.65rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+                                    <span>Total: $16.000</span>
+                                    <strong style="color: var(--primary);">$4.000 x 4</strong>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: auto;">
+                                <div style="background: var(--accent); color: white; text-align: center; padding: 10px; border-radius: 10px; font-size: 0.82rem; font-weight: 800;">
+                                    Confirmar reserva en 1 clic
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Texto de Automatización -->
+            <div>
+                <span class="showcase-pretitle">AUTOMATIZACIÓN DE RESERVAS</span>
+                <h2 class="showcase-title">
+                    ¡Recepcioná todos tus clientes <span class="accent-green">en un solo lugar!</span>
+                </h2>
+                <p class="showcase-desc">
+                    Sin importar desde dónde se contacten (WhatsApp, Instagram, Google o tu enlace directo), tus clientes podrán consultar la disponibilidad en tiempo real y reservar con un solo clic. Sin necesidad de que una persona recepcione la reserva manualmente.
+                </p>
+                <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                    <a href="/software" class="showcase-btn-primary">
+                        <span>VER FUNCIONALIDADES</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                    <a href="/club/1" class="showcase-btn-secondary">Probar reserva de muestra</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. SECCIÓN 2: GESTIÓN 100% ONLINE (Basado en imagen 3) -->
+    <section class="section-showcase" style="background: #fafbfc; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+        <div class="showcase-container reverse">
+            <!-- Texto -->
+            <div>
+                <span class="showcase-pretitle">PRUÉBALO GRATIS</span>
+                <h2 class="showcase-title">
+                    Gestioná tu complejo de forma <span style="color: var(--primary);">100% online</span>
+                </h2>
+                <p class="showcase-desc">
+                    ¡No más papel y lápiz para manejar tu complejo! Con SportGrid unificarás toda la gestión del mismo desde tu celular o computadora, en cualquier lugar y en simultáneo con otros administradores.
+                </p>
+                <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                    <a href="/software" class="btn-software-clubes" style="padding: 13px 30px; font-size: 0.95rem;">
+                        <span>VER PLANES Y PRECIOS</span>
+                    </a>
+                    <a href="https://wa.me/5493624000000?text=Hola,%20quiero%20conocer%20SportGrid%20para%20mi%20club" target="_blank" class="btn-iniciar-sesion" style="padding: 12px 24px; font-size: 0.95rem;">
+                        HABLAR CON VENTAS
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mockup Laptop / Browser Grilla ATC Style -->
+            <div class="laptop-mockup-wrapper">
+                <div class="laptop-browser-bar">
+                    <span class="laptop-dot" style="background: #ef4444;"></span>
+                    <span class="laptop-dot" style="background: #f59e0b;"></span>
+                    <span class="laptop-dot" style="background: #10b981;"></span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-left: 10px;">app.sportgrid.com.ar/grilla</span>
+                </div>
+                <div class="laptop-grid-demo">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
+                        <strong style="font-size: 0.9rem; color: var(--text-main);">Grilla de reservas · Punto Norte</strong>
+                        <span style="font-size: 0.75rem; background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: 4px; font-weight: 700;">Miércoles 23 de Junio</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 80px 1fr 1fr; gap: 6px;">
+                        <div style="font-weight: 700; font-size: 0.72rem; color: var(--text-muted);">Horario</div>
+                        <div style="font-weight: 800; font-size: 0.72rem; color: var(--text-main); background: #f1f5f9; padding: 4px; border-radius: 4px;">Cancha 1 - Fútbol</div>
+                        <div style="font-weight: 800; font-size: 0.72rem; color: var(--text-main); background: #f1f5f9; padding: 4px; border-radius: 4px;">Cancha 2 - Pádel</div>
+
+                        <div style="font-size: 0.72rem; color: var(--text-muted); padding-top: 6px;">14:00 - 15:30</div>
+                        <div style="background: #dbeafe; color: #1e40af; padding: 6px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">
+                            ✓ Santiago Díaz (Online)
+                        </div>
+                        <div style="background: #f1f5f9; color: var(--text-muted); padding: 6px; border-radius: 6px; font-size: 0.72rem; text-align: center;">
+                            Disponible
+                        </div>
+
+                        <div style="font-size: 0.72rem; color: var(--text-muted); padding-top: 6px;">15:30 - 17:00</div>
+                        <div style="background: #dcfce7; color: #166534; padding: 6px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">
+                            ✓ Carlos Espinilla (Fijo)
+                        </div>
+                        <div style="background: #dbeafe; color: #1e40af; padding: 6px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">
+                            ✓ Sebastián (Mostrador)
+                        </div>
+
+                        <div style="font-size: 0.72rem; color: var(--text-muted); padding-top: 6px;">17:00 - 18:30</div>
+                        <div style="background: #fef3c7; color: #92400e; padding: 6px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">
+                            ⏳ Reserva Pendiente
+                        </div>
+                        <div style="background: #dbeafe; color: #1e40af; padding: 6px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">
+                            ✓ Marcos M. (Split 4)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. SECCIÓN 3: SERVICIOS Y FUNCIONALIDADES (Basado en imagen 4) -->
+    <section class="section-features-checklist" id="funcionalidades">
+        <div class="features-checklist-card">
+            <h2 class="features-checklist-title">
+                Sistema integral de control y gestión para clubes
+            </h2>
+
+            <!-- Grid de 3 columnas con checkmarks vectoriales limpios -->
+            <div class="features-grid-3col">
+                <!-- Columna 1 -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Sistema de gestión de turnos</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Gestión de caja y stock</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Reportes estadísticos</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Web propia del complejo</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Grilla de turnos dinámica</span>
+                    </div>
+                </div>
+
+                <!-- Columna 2 -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Multiusuario en simultáneo</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Multiplataforma (celular, PC, tablet)</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Información y fotos de las canchas</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Filmación de partidos integrada</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Automatización de reservas 24/7</span>
+                    </div>
+                </div>
+
+                <!-- Columna 3 -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Pack digital personalizado</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Banners personalizados con QR</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Soporte técnico 24/7</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Asesoramiento para optimizar tu club</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <span class="check-icon-circle">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span>Ventas de turnos y señas 24/7</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <a href="/software" class="link-ver-funcionalidades">
+                    Ver funcionalidades y planes &rarr;
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. SECCIÓN 4: PREGUNTAS FRECUENTES (Basado en imagen 2) -->
+    <section class="section-faq" id="faq">
+        <div class="faq-container">
+            <h2 class="faq-title">Preguntas frecuentes</h2>
+            
+            <div class="faq-card">
+                <!-- FAQ 1 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Cuál es el precio del sistema?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Ofrecemos planes accesibles y escalables desde $32.000/mes para complejos pequeños hasta planes para grandes predios. Podés optar por pago mensual o anual con un 20% de descuento, sin contratos de permanencia forzados ni comisiones abusivas sobre tus turnos.
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Se pueden cobrar señas a través de la página?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí. Podés configurar tu propio Alias de CBU, CVU o cuenta de Mercado Pago para que las señas de los jugadores ingresen directamente a tu cuenta bancaria al instante, sin retenciones ni intermediarios.
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Cuántos usuarios administradores se puede tener?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        El sistema es multiusuario. Podés crear accesos para dueños, recepcionistas y encargados de cantina, permitiendo que todo tu equipo opere en simultáneo desde computadoras, tablets o celulares distintos.
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Se pueden cargar reservas de manera interna además de recibir reservas online?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Totalmente. Desde tu panel podés cargar reservas manuales que recibas por teléfono o en el mostrador, asignar turnos fijos semanales y bloquear canchas por mal clima o mantenimiento con dos clics.
+                    </div>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Se pueden configurar precios especiales según el día y horario?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí, podés establecer tarifas diferenciadas según horario diurno, nocturno (con iluminación), fines de semana y feriados, adaptando los precios automáticamente según la franja horaria.
+                    </div>
+                </div>
+
+                <!-- FAQ 6 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Se puede agregar los consumos que realice el cliente?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí. Contamos con un módulo integrado de cantina y kiosco donde podés sumar bebidas, snacks, pelotas o alquiler de paletas a la cuenta del turno para cobrar todo unificado al finalizar el partido.
+                    </div>
+                </div>
+
+                <!-- FAQ 7 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>¿Cuentan con capacitación y soporte para el uso del sistema?</span>
+                        <span class="faq-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí. Te acompañamos en la configuración inicial de tus canchas y horarios, capacitamos a tu personal y contás con soporte técnico prioritario vía WhatsApp los 7 días de la semana.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL PUBLICAR PARTIDO ABIERTO -->
+    <div id="modal-publicar-partido" class="modal-auth-overlay">
+        <div class="modal-auth-card" style="max-width: 460px;">
+            <div style="padding: 16px 22px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);">Publicar Partido Abierto</h3>
+                <button type="button" onclick="cerrarModalCrearPartido()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+            </div>
+            <div class="auth-body">
+                <form id="form-crear-partido" onsubmit="guardarPartidoAbierto(event)">
+                    <div class="auth-input-group">
+                        <label class="auth-label">Complejo Deportivo</label>
+                        <select id="partido-club-select" class="auth-input" required onchange="actualizarCanchasPartido(this.value)">
+                            <option value="1">Punto Norte (Resistencia)</option>
+                            <option value="2">Costa Pádel (Corrientes)</option>
+                            <option value="3">Arena Complejo (Resistencia)</option>
+                        </select>
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-label">Cancha</label>
+                        <select id="partido-cancha-select" class="auth-input" required>
+                            <option value="1">Cancha 1 (Pádel Cristal)</option>
+                            <option value="2">Cancha 2 (Pádel Muro)</option>
+                            <option value="3">Cancha 3 (Pádel Techada)</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+                        <div>
+                            <label class="auth-label">Fecha</label>
+                            <input type="date" id="partido-fecha" class="auth-input" required>
+                        </div>
+                        <div>
+                            <label class="auth-label">Horario</label>
+                            <select id="partido-hora" class="auth-input" required>
+                                <option value="18:00">18:00 hs</option>
+                                <option value="19:30" selected>19:30 hs</option>
+                                <option value="20:00">20:00 hs</option>
+                                <option value="21:00">21:00 hs</option>
+                                <option value="21:30">21:30 hs</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+                        <div>
+                            <label class="auth-label">Deporte</label>
+                            <select id="partido-deporte" class="auth-input">
+                                <option value="Pádel" selected>Pádel</option>
+                                <option value="Fútbol 5">Fútbol 5</option>
+                                <option value="Tenis">Tenis</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="auth-label">Jugadores que faltan</label>
+                            <select id="partido-faltantes" class="auth-input">
+                                <option value="1" selected>Falta 1</option>
+                                <option value="2">Faltan 2</option>
+                                <option value="3">Faltan 3</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-label">Nivel estimado</label>
+                        <input type="text" id="partido-nivel" class="auth-input" placeholder="Ej: 7ma / 6ta categoría, Intermedio..." required value="7ma Categoría">
+                    </div>
+                    <div class="auth-input-group" style="margin-bottom: 20px;">
+                        <label class="auth-label">Mensaje / Buena onda</label>
+                        <input type="text" id="partido-desc" class="auth-input" placeholder="Ej: Partido parejo entre amigos, tercer tiempo asegurado!" value="Partido parejo entre amigos, tercer tiempo asegurado!">
+                    </div>
+                    <button type="submit" class="btn-auth-submit">Publicar en SportGrid</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL AUTENTICACIÓN JUGADORES (Iniciar sesión / Registrarse) -->
+    <div id="modal-auth" class="modal-auth-overlay">
+        <div class="modal-auth-card">
+            <div style="padding: 16px 22px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <div class="logo" style="font-size: 1.25rem;">
+                    <span class="logo-sport">SPORT</span><span class="logo-grid">GRID</span>
+                </div>
+                <button type="button" onclick="cerrarModalAuth()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+            </div>
+
+            <!-- Selector de Pestaña -->
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab-btn active" id="tab-login" onclick="cambiarTabAuth('login')">Iniciar Sesión</button>
+                <button type="button" class="auth-tab-btn" id="tab-registro" onclick="cambiarTabAuth('registro')">Crear Cuenta</button>
+            </div>
+
+            <!-- Formulario Login -->
+            <div class="auth-body" id="form-auth-login">
+                <form onsubmit="procesarAuth(event, 'login')">
+                    <div class="auth-input-group">
+                        <label class="auth-label">Email o Teléfono</label>
+                        <input type="text" id="auth-login-input" class="auth-input" placeholder="tu@email.com o número" required>
+                    </div>
+                    <div class="auth-input-group" style="margin-bottom: 20px;">
+                        <label class="auth-label">Contraseña</label>
+                        <input type="password" id="auth-password-input" class="auth-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-auth-submit">Ingresar a SportGrid</button>
                     
-                    contenedor.appendChild(btnTurno);
-                });
-            } catch (error) {
-                contenedor.innerHTML = '<span style="color: red;">Error al cargar horarios.</span>';
+                    <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">Acceso rápido de prueba (Jugadores):</span>
+                        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 8px; flex-wrap: wrap;">
+                            <button type="button" onclick="loginRapidoDemo('carlos@jugador.com', '123456')" style="font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; cursor: pointer; font-weight: 700;">Carlos Benítez</button>
+                            <button type="button" onclick="loginRapidoDemo('agustin@jugador.com', '123456')" style="font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; cursor: pointer; font-weight: 700;">Agustín Morales</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Formulario Registro -->
+            <div class="auth-body" id="form-auth-registro" style="display: none;">
+                <form onsubmit="procesarAuth(event, 'registro')">
+                    <div class="auth-input-group">
+                        <label class="auth-label">Nombre y Apellido</label>
+                        <input type="text" id="reg-nombre-input" class="auth-input" placeholder="Ej: Juan Pérez" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-label">Email</label>
+                        <input type="email" id="reg-email-input" class="auth-input" placeholder="juan@ejemplo.com" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-label">WhatsApp / Teléfono</label>
+                        <input type="tel" id="reg-tel-input" class="auth-input" placeholder="Ej: 3624112233" required>
+                    </div>
+                    <div class="auth-input-group" style="margin-bottom: 20px;">
+                        <label class="auth-label">Crear Contraseña</label>
+                        <input type="password" id="reg-password-input" class="auth-input" placeholder="Mínimo 6 caracteres" required>
+                    </div>
+                    <button type="submit" class="btn-auth-submit">Crear Cuenta Gratis</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer-atc" style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 32px 20px;">
+        <p>&copy; 2026 SPORTGRID · Red de Canchas y Plataforma de Gestión Deportiva de Argentina</p>
+        <div style="display: flex; gap: 20px; font-size: 0.84rem; flex-wrap: wrap; justify-content: center; align-items: center;">
+            <a href="/terminos" style="color: var(--text-muted); text-decoration: none;">Términos y Políticas</a>
+            <a href="/terminos#arrepentimiento" style="color: #ef4444; font-weight: 800; text-decoration: underline;">Botón de Arrepentimiento (Ley 24.240)</a>
+            <a href="/software" style="color: var(--primary); font-weight: 800; text-decoration: none;">Software para Clubes</a>
+        </div>
+    </footer>
+
+    <!-- BASE DE DATOS Y SCRIPTS INTERACTIVOS -->
+    <script>
+        // Clubes conectados de forma real desde la base de datos de SportGrid
+        let clubesData = [];
+
+        async function cargarClubesDesdeServidor() {
+            try {
+                const res = await fetch('/api/clubes');
+                if (res.ok) {
+                    const data = await res.json();
+                    clubesData = data.map(c => ({
+                        id: c.id_club,
+                        nombre: c.nombre_club,
+                        ciudad: c.ciudad,
+                        direccion: c.direccion,
+                        deportes: c.deportes && c.deportes.length > 0 ? c.deportes : ['Pádel'],
+                        canchas: c.total_canchas || 2,
+                        precio_desde: c.precio_desde || 16000,
+                        servicios: c.servicios ? c.servicios.split(',').map(s => s.trim()) : ['Cantina', 'Estacionamiento', 'Iluminación LED'],
+                        turnos: ["18:00", "19:30", "21:00", "22:30"],
+                        img: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=700&q=80",
+                        logo: c.nombre_club.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(),
+                        lat: -27.4285,
+                        lng: -59.0234
+                    }));
+                }
+            } catch (e) {
+                console.warn('No se pudieron cargar clubes del servidor:', e);
             }
         }
 
-        // Arrancamos la aplicación
-        cargarCanchas();
+        let leafletMapInstance = null;
+        let mapMarkers = [];
+
+        function normalizar(texto) {
+            return (texto || '')
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+        }
+
+        const aliasCiudades = {
+            "caba": "buenos aires",
+            "capital": "buenos aires",
+            "capital federal": "buenos aires",
+            "ba": "buenos aires",
+            "baires": "buenos aires",
+            "bs as": "buenos aires",
+            "bsas": "buenos aires",
+            "chaco": "resistencia",
+            "fontana": "resistencia",
+            "resis": "resistencia",
+            "ctes": "corrientes",
+            "cordoba capital": "cordoba"
+        };
+
+        function seleccionarCiudad(nombre) {
+            const input = document.getElementById('buscador-ciudad');
+            if (input) {
+                input.value = nombre;
+                ejecutarBusqueda();
+            }
+        }
+
+        // CONTROL DE DROPDOWNS FLOTANTES PERSONALIZADOS
+        function toggleDropdown(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const wasOpen = el.classList.contains('open');
+            document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('open'));
+            if (!wasOpen) {
+                el.classList.add('open');
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-dropdown')) {
+                document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('open'));
+            }
+        });
+
+        // ESTADO DE FILTROS SECUNDARIOS (MULTI-SELECCIÓN)
+        let filtroSuperficies = [];
+        let filtroServicios = [];
+        let filtroCerramientos = [];
+        let criterioOrden = 'recomendados';
+        let duracionSeleccionada = 'todas';
+        let coordenadasUsuario = null; // { lat, lng } para geolocalización
+
+        function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+            if (!lat1 || !lon1 || !lat2 || !lon2) return 9999;
+            const R = 6371; // Radio de la tierra en km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function activarGeolocalizacion(event) {
+            if (event) event.preventDefault();
+            const btn = document.getElementById('btn-cerca-gps');
+            const texto = document.getElementById('texto-cerca-gps');
+            const inputCiudad = document.getElementById('buscador-ciudad');
+
+            if (btn) btn.classList.add('active');
+            if (texto) texto.innerText = 'Ubicando...';
+
+            const aplicarCoordenadas = (lat, lng, nombreZona) => {
+                coordenadasUsuario = { lat, lng };
+                if (inputCiudad) inputCiudad.value = nombreZona || 'Cerca de mí';
+                if (texto) texto.innerText = 'GPS Activo';
+                criterioOrden = 'cercania';
+                const rCercania = document.querySelector('input[name="radio-orden"][value="cercania"]');
+                if (rCercania) rCercania.checked = true;
+                const lblOrden = document.getElementById('label-orden');
+                if (lblOrden) lblOrden.innerText = 'Más cercanos';
+                ejecutarBusqueda(null, true);
+            };
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        aplicarCoordenadas(pos.coords.latitude, pos.coords.longitude, 'Cerca de mí');
+                    },
+                    (err) => {
+                        console.warn('Geolocalización bloqueada o con error. Usando fallback de ubicación:', err);
+                        // Fallback: ubicación local en Corrientes
+                        aplicarCoordenadas(-27.4810, -58.8350, 'Corrientes (Cerca de mí)');
+                    },
+                    { timeout: 8000, enableHighAccuracy: true }
+                );
+            } else {
+                aplicarCoordenadas(-27.4810, -58.8350, 'Corrientes (Cerca de mí)');
+            }
+        }
+
+        function actualizarFiltrosMulti(tipo) {
+            if (tipo === 'superficie') {
+                filtroSuperficies = Array.from(document.querySelectorAll('input[name="chk-superficie"]:checked')).map(c => c.value);
+                actualizarBadgePill('superficie', filtroSuperficies.length, 'Superficie');
+            } else if (tipo === 'servicios') {
+                filtroServicios = Array.from(document.querySelectorAll('input[name="chk-servicios"]:checked')).map(c => c.value);
+                actualizarBadgePill('servicios', filtroServicios.length, 'Servicios del club');
+            } else if (tipo === 'cerramiento') {
+                filtroCerramientos = Array.from(document.querySelectorAll('input[name="chk-cerramiento"]:checked')).map(c => c.value);
+                actualizarBadgePill('cerramiento', filtroCerramientos.length, 'Cerramiento');
+            }
+            verificarBotonReset();
+            filtrarResultados();
+        }
+
+        function actualizarBadgePill(tipo, count, defaultLabel) {
+            const btn = document.getElementById(`btn-pill-${tipo}`);
+            const badge = document.getElementById(`badge-${tipo}`);
+            const label = document.getElementById(`label-${tipo}`);
+
+            if (count > 0) {
+                if (btn) btn.classList.add('has-selection');
+                if (badge) {
+                    badge.innerText = count;
+                    badge.style.display = 'inline-flex';
+                }
+                if (label) label.innerText = `${defaultLabel} (${count})`;
+            } else {
+                if (btn) btn.classList.remove('has-selection');
+                if (badge) badge.style.display = 'none';
+                if (label) label.innerText = defaultLabel;
+            }
+        }
+
+        function limpiarGrupoMulti(tipo) {
+            document.querySelectorAll(`input[name="chk-${tipo}"]`).forEach(c => c.checked = false);
+            actualizarFiltrosMulti(tipo);
+        }
+
+        function cambiarOrden(val, label) {
+            criterioOrden = val;
+            const lbl = document.getElementById('label-orden');
+            if (lbl) lbl.innerText = label;
+            document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('open'));
+            verificarBotonReset();
+            filtrarResultados();
+        }
+
+        function cambiarDuracionTurno(val) {
+            duracionSeleccionada = val;
+            const lbl = document.getElementById('label-duracion');
+            const btn = document.getElementById('btn-pill-duracion');
+            if (lbl) {
+                lbl.innerText = (val === 'todas') ? 'Duración' : `Duración: ${val}m`;
+            }
+            if (btn) {
+                if (val !== 'todas') {
+                    btn.classList.add('has-selection');
+                } else {
+                    btn.classList.remove('has-selection');
+                }
+            }
+            const bDur = document.getElementById('buscador-duracion');
+            if (bDur) bDur.value = val;
+            document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('open'));
+            verificarBotonReset();
+            filtrarResultados();
+        }
+
+        function restablecerTodosLosFiltros() {
+            filtroSuperficies = [];
+            filtroServicios = [];
+            filtroCerramientos = [];
+            criterioOrden = 'recomendados';
+            duracionSeleccionada = 'todas';
+            document.querySelectorAll('input[name="chk-superficie"]').forEach(c => c.checked = false);
+            document.querySelectorAll('input[name="chk-servicios"]').forEach(c => c.checked = false);
+            document.querySelectorAll('input[name="chk-cerramiento"]').forEach(c => c.checked = false);
+            const rRecom = document.querySelector('input[name="radio-orden"][value="recomendados"]');
+            if (rRecom) rRecom.checked = true;
+            document.getElementById('label-orden').innerText = 'Ordenar';
+
+            const rDur = document.querySelector('input[name="radio-duracion"][value="todas"]');
+            if (rDur) rDur.checked = true;
+            const lblDur = document.getElementById('label-duracion');
+            if (lblDur) lblDur.innerText = 'Duración';
+            const btnDur = document.getElementById('btn-pill-duracion');
+            if (btnDur) btnDur.classList.remove('has-selection');
+            const bDur = document.getElementById('buscador-duracion');
+            if (bDur) bDur.value = 'todas';
+
+            const inputNom = document.getElementById('filtro-nombre-club');
+            if (inputNom) inputNom.value = '';
+
+            actualizarBadgePill('superficie', 0, 'Superficie');
+            actualizarBadgePill('servicios', 0, 'Servicios del club');
+            actualizarBadgePill('cerramiento', 0, 'Cerramiento');
+            verificarBotonReset();
+            filtrarResultados();
+        }
+
+        function verificarBotonReset() {
+            const btn = document.getElementById('btn-reset-todos-filtros');
+            if (!btn) return;
+            const hayFiltros = filtroSuperficies.length > 0 || 
+                               filtroServicios.length > 0 || 
+                               filtroCerramientos.length > 0 || 
+                               criterioOrden !== 'recomendados' || 
+                               (duracionSeleccionada && duracionSeleccionada !== 'todas') ||
+                               (document.getElementById('filtro-nombre-club')?.value || '') !== '';
+            btn.style.display = hayFiltros ? 'inline-flex' : 'none';
+        }
+
+        function toggleVistaMapa(activo) {
+            const wrap = document.getElementById('mapa-wrapper');
+            if (!wrap) return;
+            if (activo) {
+                wrap.classList.add('activo');
+                setTimeout(() => {
+                    inicializarMapaResultados();
+                }, 100);
+            } else {
+                wrap.classList.remove('activo');
+            }
+        }
+
+        function inicializarMapaResultados() {
+            const mapDiv = document.getElementById('mapa-interactivo');
+            if (!mapDiv || typeof L === 'undefined') return;
+
+            const clubsFiltrados = obtenerClubesFiltrados();
+            if (clubsFiltrados.length === 0) return;
+
+            const primerClub = clubsFiltrados[0];
+            const centerLat = primerClub.lat || -27.4514;
+            const centerLng = primerClub.lng || -58.9866;
+
+            if (!leafletMapInstance) {
+                leafletMapInstance = L.map('mapa-interactivo').setView([centerLat, centerLng], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(leafletMapInstance);
+            } else {
+                leafletMapInstance.setView([centerLat, centerLng], 13);
+                mapMarkers.forEach(m => leafletMapInstance.removeLayer(m));
+                mapMarkers = [];
+            }
+
+            const bounds = [];
+            clubsFiltrados.forEach(c => {
+                if (c.lat && c.lng) {
+                    const marker = L.marker([c.lat, c.lng]).addTo(leafletMapInstance);
+                    marker.bindPopup(`
+                        <div style="font-family: sans-serif; font-size: 0.85rem; line-height: 1.3;">
+                            <strong style="font-size: 0.95rem; color: #0f172a;">${c.nombre}</strong><br>
+                            <span style="color: #64748b; font-size: 0.78rem;">${c.direccion}</span><br>
+                            <span style="color: #2563eb; font-weight: 800; font-size: 0.85rem; display: block; margin-top: 4px;">Desde $${c.precio_desde.toLocaleString('es-AR')}</span>
+                            <a href="/club/${c.id}" style="display: inline-block; margin-top: 6px; background: #2563eb; color: white; padding: 4px 10px; border-radius: 4px; text-decoration: none; font-size: 0.75rem; font-weight: 700;">Ver turnos &rarr;</a>
+                        </div>
+                    `);
+                    mapMarkers.push(marker);
+                    bounds.push([c.lat, c.lng]);
+                }
+            });
+
+            if (bounds.length > 1) {
+                leafletMapInstance.fitBounds(bounds, { padding: [30, 30] });
+            }
+            leafletMapInstance.invalidateSize();
+        }
+
+        function obtenerClubesFiltrados() {
+            const ciudadInput = document.getElementById('buscador-ciudad');
+            const ciudadRaw = ciudadInput ? ciudadInput.value.trim() : '';
+            let ciudadNorm = normalizar(ciudadRaw);
+            if (aliasCiudades[ciudadNorm]) {
+                ciudadNorm = aliasCiudades[ciudadNorm];
+            }
+
+            const deporteSelect = document.getElementById('buscador-deporte');
+            const deporte = deporteSelect ? deporteSelect.value : 'todos';
+            const deporteNorm = normalizar(deporte);
+
+            const queryNombre = normalizar(document.getElementById('filtro-nombre-club')?.value || '');
+
+            const esCercania = ciudadNorm.includes('cerca') || ciudadNorm.includes('gps') || ciudadNorm.includes('mi ubicacion');
+
+            let filtrados = clubesData.filter(club => {
+                const clubCiudadNorm = normalizar(club.ciudad);
+                const coincideCiudad = esCercania || !ciudadNorm || clubCiudadNorm.includes(ciudadNorm) || ciudadNorm.includes(clubCiudadNorm);
+                const deportesStr = club.deportes.map(d => normalizar(d)).join(' ');
+                const coincideDeporte = deporteNorm === 'todos' || deportesStr.includes(deporteNorm);
+
+                if (!coincideCiudad || !coincideDeporte) return false;
+
+                // 1. Filtro rápido por nombre
+                if (queryNombre && !normalizar(club.nombre).includes(queryNombre)) {
+                    return false;
+                }
+                // 2. Filtro multi-selección de superficies
+                if (filtroSuperficies.length > 0 && !filtroSuperficies.includes(club.superficie)) {
+                    return false;
+                }
+                // 3. Filtro multi-selección de servicios (debe cumplir todos los seleccionados)
+                if (filtroServicios.length > 0) {
+                    const tieneTodos = filtroServicios.every(s => club.servicios && club.servicios.includes(s));
+                    if (!tieneTodos) return false;
+                }
+                // 4. Filtro multi-selección de cerramientos
+                if (filtroCerramientos.length > 0 && !filtroCerramientos.includes(club.cerramiento)) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            // Si hay geolocalización o búsqueda de cercanía, calcular distancias
+            filtrados.forEach(c => {
+                if (coordenadasUsuario && c.lat && c.lng) {
+                    c.distancia_km = calcularDistanciaKm(coordenadasUsuario.lat, coordenadasUsuario.lng, c.lat, c.lng);
+                } else {
+                    c.distancia_km = null;
+                }
+            });
+
+            // Ordenamiento dinámico
+            if (criterioOrden === 'cercania' || (esCercania && criterioOrden === 'recomendados')) {
+                filtrados.sort((a, b) => (a.distancia_km || 9999) - (b.distancia_km || 9999));
+            } else if (criterioOrden === 'precio-menor') {
+                filtrados.sort((a, b) => (a.precio_desde || 0) - (b.precio_desde || 0));
+            } else if (criterioOrden === 'precio-mayor') {
+                filtrados.sort((a, b) => (b.precio_desde || 0) - (a.precio_desde || 0));
+            } else if (criterioOrden === 'canchas-mas') {
+                filtrados.sort((a, b) => (b.canchas || 0) - (a.canchas || 0));
+            }
+
+            return filtrados;
+        }
+
+        function filtrarResultados() {
+            renderizarListaClubes();
+        }
+
+        async function ejecutarBusqueda(e, shouldScroll = true) {
+            if (e && e.preventDefault) e.preventDefault();
+            const seccion = document.getElementById('seccion-resultados');
+            if (seccion) seccion.style.display = 'block';
+
+            // Actualizar datos de clubes reales desde la base de datos
+            await cargarClubesDesdeServidor();
+
+            const ciudadInput = document.getElementById('buscador-ciudad');
+            const ciudadRaw = ciudadInput ? ciudadInput.value.trim() : '';
+            let ciudadNorm = normalizar(ciudadRaw);
+            if (aliasCiudades[ciudadNorm]) {
+                ciudadNorm = aliasCiudades[ciudadNorm];
+            }
+
+            // Cargar turnos liberados con descuento SOLO cuando el usuario busca
+            await cargarOfertasHome(ciudadNorm);
+
+            renderizarListaClubes();
+            if (shouldScroll && seccion) {
+                seccion.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function renderizarListaClubes() {
+            const seccion = document.getElementById('seccion-resultados');
+            const grilla = document.getElementById('grilla-resultados');
+            const titulo = document.getElementById('titulo-resultados');
+            const barraFiltros = document.getElementById('barra-filtros-atc');
+
+            const duracionRaw = document.getElementById('buscador-duracion')?.value;
+            const duracion = (duracionRaw && duracionRaw !== 'todas') ? duracionRaw : '90';
+            const ciudadInput = document.getElementById('buscador-ciudad');
+            const ciudadRaw = ciudadInput ? ciudadInput.value.trim() : '';
+            let ciudadNorm = normalizar(ciudadRaw);
+            if (aliasCiudades[ciudadNorm]) {
+                ciudadNorm = aliasCiudades[ciudadNorm];
+            }
+
+            const filtrados = obtenerClubesFiltrados();
+            grilla.innerHTML = '';
+
+            if (filtrados.length > 0) {
+                if (barraFiltros) barraFiltros.style.display = 'flex';
+                
+                const ciudadDisplay = ciudadRaw ? `${ciudadRaw}, Argentina` : 'Argentina';
+                titulo.innerText = `${filtrados.length} ${filtrados.length === 1 ? 'club encontrado' : 'clubes encontrados'} en ${ciudadDisplay}`;
+
+                filtrados.forEach(club => {
+                    const card = document.createElement('div');
+                    card.className = 'club-card-atc';
+
+                    const distanciaTag = club.distancia_km != null ? `
+                        <div class="card-distancia-tag">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>a ${club.distancia_km < 1 ? Math.round(club.distancia_km * 1000) + ' m' : club.distancia_km.toFixed(1) + ' km'} de vos</span>
+                        </div>
+                    ` : '';
+
+                    const turnosPills = (club.turnos || ["18:00", "19:30", "21:00"]).map(t => `
+                        <a href="/club/${club.id}?hora=${t}&duracion=${duracion}" class="btn-turno-pill-atc" title="Reservar turno a las ${t} hs">
+                            ${t}
+                        </a>
+                    `).join('');
+
+                    card.innerHTML = `
+                        <div class="card-img-atc-wrap">
+                            <a href="/club/${club.id}?duracion=${duracion}">
+                                <img src="${club.img}" alt="${club.nombre}" class="card-img-atc">
+                            </a>
+                            <div class="card-price-overlay-atc">
+                                <span class="price-lbl">desde</span>
+                                <span class="price-val">$ ${club.precio_desde ? club.precio_desde.toLocaleString('es-AR') : '25.000'}</span>
+                            </div>
+                        </div>
+                        <div class="card-content-atc">
+                            <div class="card-title-row-atc">
+                                <a href="/club/${club.id}?duracion=${duracion}" style="text-decoration: none; color: inherit;">
+                                    <h3 class="card-name-atc">${club.nombre}</h3>
+                                </a>
+                                <div class="card-logo-badge">${club.logo || 'SG'}</div>
+                            </div>
+                            <p class="card-addr-atc">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span>${club.direccion}</span>
+                            </p>
+                            ${distanciaTag}
+                            <div class="card-turnos-row-atc">
+                                ${turnosPills}
+                            </div>
+                        </div>
+                    `;
+                    grilla.appendChild(card);
+                });
+
+                const toggleMapa = document.getElementById('toggle-mapa');
+                if (toggleMapa && toggleMapa.checked) {
+                    inicializarMapaResultados();
+                }
+
+            } else {
+                // Verificar si hay clubes en la ciudad buscada pero los filtros secundarios no coinciden
+                const clubesEnCiudad = clubesData.filter(c => {
+                    const cNorm = normalizar(c.ciudad);
+                    return !ciudadNorm || cNorm.includes(ciudadNorm) || ciudadNorm.includes(cNorm);
+                });
+
+                const hayFiltrosSecundarios = filtroSuperficies.length > 0 || filtroServicios.length > 0 || filtroCerramientos.length > 0 || (document.getElementById('filtro-nombre-club')?.value || '') !== '';
+
+                if (clubesEnCiudad.length > 0 && hayFiltrosSecundarios) {
+                    if (barraFiltros) barraFiltros.style.display = 'flex';
+                    titulo.innerText = `0 clubes encontrados en ${ciudadRaw || 'Argentina'}`;
+
+                    grilla.innerHTML = `
+                        <div style="grid-column: 1/-1; background: white; padding: 48px 24px; border-radius: 18px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 8px 25px rgba(0,0,0,0.03); max-width: 650px; margin: 0 auto; width: 100%;">
+                            <div style="width: 64px; height: 64px; border-radius: 50%; background: #f8fafc; color: #64748b; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid #e2e8f0;">
+                                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                                </svg>
+                            </div>
+                            <span style="font-size: 0.74rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px;">CRITERIOS DE FILTRADO</span>
+                            <h3 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 8px 0 10px; line-height: 1.3;">
+                                No encontramos canchas con esa combinación de filtros
+                            </h3>
+                            <p style="color: #64748b; font-size: 0.92rem; max-width: 500px; margin: 0 auto 22px; line-height: 1.5;">
+                                Disponemos de clubes registrados en <strong>${ciudadRaw}</strong>, pero ninguno cumple simultáneamente con todos los requisitos seleccionados.
+                            </p>
+                            <button type="button" onclick="restablecerTodosLosFiltros()" style="background: var(--primary); color: white; border: none; padding: 12px 26px; border-radius: 9999px; font-weight: 700; font-size: 0.88rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(37,99,235,0.25);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                                <span>Restablecer filtros de búsqueda</span>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Mensaje institucional altamente profesional para ciudad sin complejos
+                    if (barraFiltros) barraFiltros.style.display = 'none';
+                    titulo.innerText = `Red SportGrid · ${ciudadRaw || 'Cobertura nacional'}`;
+
+                    grilla.innerHTML = `
+                        <div style="grid-column: 1/-1; background: white; padding: 52px 28px; border-radius: 20px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.03); max-width: 680px; margin: 0 auto; width: 100%;">
+                            <div style="width: 72px; height: 72px; border-radius: 50%; background: #eff6ff; color: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid #bfdbfe;">
+                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <span style="font-size: 0.74rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.9px;">EXPANSIÓN DE RED FEDERAL</span>
+                            <h3 style="font-size: 1.55rem; font-weight: 900; color: #0f172a; margin: 8px 0 12px; line-height: 1.3;">
+                                ${ciudadRaw ? `Aún no disponemos de complejos habilitados en ${ciudadRaw}` : 'Aún no disponemos de complejos en esta localidad'}
+                            </h3>
+                            <p style="color: #64748b; font-size: 0.94rem; max-width: 530px; margin: 0 auto 24px; line-height: 1.55;">
+                                ${ciudadRaw ? `Nuestro equipo de expansión territorial se encuentra en proceso de vinculación y homologación con clubes de <strong>${ciudadRaw}</strong>. Trabajamos de forma continua para incorporar nuevas instalaciones a la red oficial de SportGrid.` : `Actualmente no disponemos de predios adheridos en esta zona. Continuamos incorporando nuevos clubes en todo el país.`}
+                            </p>
+                            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px;">
+                                <a href="/software" style="background: var(--primary); color: white; padding: 12px 24px; border-radius: 9999px; text-decoration: none; font-weight: 800; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(37,99,235,0.25);">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                    <span>Adherir mi complejo a SportGrid</span>
+                                </a>
+                                <a href="https://wa.me/5493624000000?text=Hola,%20quisiera%20solicitar%20o%20recomendar%20un%20complejo%20deportivo%20en%20${encodeURIComponent(ciudadRaw || 'mi localidad')}" target="_blank" style="background: #f1f5f9; color: #1e293b; padding: 12px 22px; border-radius: 9999px; text-decoration: none; font-weight: 700; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                    <span>Solicitar apertura en ${ciudadRaw || 'mi ciudad'}</span>
+                                </a>
+                            </div>
+                            <div style="background: #fafbfc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 16px 20px;">
+                                <span style="display: block; font-size: 0.74rem; font-weight: 800; color: #64748b; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.6px;">
+                                    Localidades con disponibilidad inmediata en tiempo real:
+                                </span>
+                                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                                    <button type="button" onclick="seleccionarCiudad('Resistencia')" style="background: white; border: 1px solid #cbd5e1; padding: 7px 15px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; color: var(--primary); cursor: pointer; transition: 0.2s;">📍 Resistencia</button>
+                                    <button type="button" onclick="seleccionarCiudad('Corrientes')" style="background: white; border: 1px solid #cbd5e1; padding: 7px 15px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; color: var(--primary); cursor: pointer; transition: 0.2s;">📍 Corrientes</button>
+                                    <button type="button" onclick="seleccionarCiudad('Buenos Aires')" style="background: white; border: 1px solid #cbd5e1; padding: 7px 15px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; color: var(--primary); cursor: pointer; transition: 0.2s;">📍 Buenos Aires (CABA)</button>
+                                    <button type="button" onclick="seleccionarCiudad('Córdoba')" style="background: white; border: 1px solid #cbd5e1; padding: 7px 15px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; color: var(--primary); cursor: pointer; transition: 0.2s;">📍 Córdoba</button>
+                                    <button type="button" onclick="seleccionarCiudad('Rosario')" style="background: white; border: 1px solid #cbd5e1; padding: 7px 15px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; color: var(--primary); cursor: pointer; transition: 0.2s;">📍 Rosario</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+
+        // Toggle del Acordeón FAQ
+        function toggleFaq(elem) {
+            const item = elem.parentElement;
+            const isOpen = item.classList.contains('active');
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+            if (!isOpen) {
+                item.classList.add('active');
+            }
+        }
+
+        // Modal Auth
+        function abrirModalAuth() {
+            document.getElementById('modal-auth').classList.add('abierto');
+        }
+
+        function cerrarModalAuth() {
+            document.getElementById('modal-auth').classList.remove('abierto');
+        }
+
+        function cambiarTabAuth(tab) {
+            if (tab === 'login') {
+                document.getElementById('tab-login').classList.add('active');
+                document.getElementById('tab-registro').classList.remove('active');
+                document.getElementById('form-auth-login').style.display = 'block';
+                document.getElementById('form-auth-registro').style.display = 'none';
+            } else {
+                document.getElementById('tab-registro').classList.add('active');
+                document.getElementById('tab-login').classList.remove('active');
+                document.getElementById('form-auth-registro').style.display = 'block';
+                document.getElementById('form-auth-login').style.display = 'none';
+            }
+        }
+
+        async function procesarAuth(e, tipo) {
+            e.preventDefault();
+            if (tipo === 'login') {
+                const loginVal = document.getElementById('auth-login-input').value.trim();
+                const pwd = document.getElementById('auth-password-input').value.trim();
+                try {
+                    const res = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ login: loginVal, password: pwd })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        cerrarModalAuth();
+                        const params = new URLSearchParams(window.location.search);
+                        if (params.get('auth') === 'login') {
+                            window.location.href = '/mis-reservas';
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        alert(data.error || 'Credenciales incorrectas');
+                    }
+                } catch (err) {
+                    alert('Error al conectar con el servidor.');
+                }
+            } else {
+                const nom = document.getElementById('reg-nombre-input').value.trim();
+                const em = document.getElementById('reg-email-input').value.trim();
+                const tel = document.getElementById('reg-tel-input').value.trim();
+                const pwd = document.getElementById('reg-password-input').value.trim();
+                try {
+                    const res = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nombre_completo: nom, email: em, telefono: tel, password: pwd })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        cerrarModalAuth();
+                        window.location.reload();
+                    } else {
+                        alert(data.error || 'No se pudo crear la cuenta');
+                    }
+                } catch (err) {
+                    alert('Error al conectar con el servidor.');
+                }
+            }
+        }
+
+        function loginRapidoDemo(email, pass) {
+            document.getElementById('auth-login-input').value = email;
+            document.getElementById('auth-password-input').value = pass;
+            procesarAuth(new Event('submit'), 'login');
+        }
+
+        // Matchmaking: Partidos Abiertos
+        async function cargarPartidosAbiertos() {
+            const container = document.getElementById('grilla-partidos-abiertos');
+            if (!container) return;
+            try {
+                const res = await fetch('/api/partidos-abiertos');
+                const partidos = await res.json();
+                if (partidos.length === 0) {
+                    container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:30px; grid-column:1/-1;">No hay partidos abiertos en este momento. ¡Sé el primero en publicar uno!</div>`;
+                    return;
+                }
+                container.innerHTML = partidos.map(p => {
+                    const faltan = p.jugadores_faltantes;
+                    const badgeFalta = faltan === 1 ? '⚠️ Falta 1 jugador' : `⚠️ Faltan ${faltan} jugadores`;
+                    return `
+                        <div style="background: white; border: 1.5px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="background: var(--primary-light); color: var(--primary); font-size: 0.75rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
+                                        ${p.deporte} · ${p.nivel}
+                                    </span>
+                                    <span style="background: #fef3c7; color: #b45309; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
+                                        ${badgeFalta}
+                                    </span>
+                                </div>
+                                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">
+                                    ${p.nombre_club}
+                                </h3>
+                                <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">
+                                    📍 ${p.cancha_nombre} · ${p.ciudad}
+                                </div>
+                                <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+                                    🗓️ ${p.fecha} · ⏰ <span style="color: var(--primary);">${p.hora_inicio} hs</span>
+                                </div>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px; background: var(--bg-body); padding: 8px 12px; border-radius: 8px;">
+                                    "${p.descripcion || 'Partido parejo, buen tercer tiempo!'}"
+                                </p>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.78rem; color: var(--text-muted);">
+                                    <span>Organiza: <strong>${p.creador_nombre}</strong></span>
+                                    <span>${p.total_inscriptos} unidos</span>
+                                </div>
+                                <button type="button" onclick="unirseAPartido(${p.id_partido})" class="btn-buscar-capsule" style="width: 100%; justify-content: center; padding: 10px; font-size: 0.85rem;">
+                                    <span>✓ Sumarme al Partido</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error('Error al cargar partidos:', e);
+            }
+        }
+
+        async function unirseAPartido(idPartido) {
+            try {
+                const res = await fetch(`/api/partidos-abiertos/${idPartido}/unirse`, { method: 'POST' });
+                const data = await res.json();
+                if (res.status === 401) {
+                    abrirModalAuth();
+                    return;
+                }
+                if (data.success) {
+                    alert(data.mensaje || '¡Te uniste al partido!');
+                    cargarPartidosAbiertos();
+                } else {
+                    alert(data.error || 'No fue posible unirte.');
+                }
+            } catch (e) {
+                alert('Error al conectar con el servidor.');
+            }
+        }
+
+        function abrirModalCrearPartido() {
+            const hoy = new Date().toISOString().split('T')[0];
+            const fechaInput = document.getElementById('partido-fecha');
+            if (fechaInput) fechaInput.value = hoy;
+            document.getElementById('modal-publicar-partido').classList.add('abierto');
+        }
+
+        function cerrarModalCrearPartido() {
+            document.getElementById('modal-publicar-partido').classList.remove('abierto');
+        }
+
+        function actualizarCanchasPartido(clubId) {
+            const select = document.getElementById('partido-cancha-select');
+            if (clubId === '1') {
+                select.innerHTML = '<option value="1">Cancha 1 (Pádel Cristal)</option><option value="2">Cancha 2 (Pádel Muro)</option><option value="3">Cancha 3 (Pádel Techada)</option>';
+            } else if (clubId === '2') {
+                select.innerHTML = '<option value="4">Cancha Panorámica 1</option><option value="5">Cancha Techada 2</option>';
+            } else {
+                select.innerHTML = '<option value="6">Cancha Central</option><option value="7">Cancha Fútbol 5 Sintético</option>';
+            }
+        }
+
+        async function guardarPartidoAbierto(e) {
+            e.preventDefault();
+            const payload = {
+                id_club: document.getElementById('partido-club-select').value,
+                id_instalacion: document.getElementById('partido-cancha-select').value,
+                fecha: document.getElementById('partido-fecha').value,
+                hora_inicio: document.getElementById('partido-hora').value,
+                deporte: document.getElementById('partido-deporte').value,
+                jugadores_faltantes: document.getElementById('partido-faltantes').value,
+                nivel: document.getElementById('partido-nivel').value,
+                descripcion: document.getElementById('partido-desc').value
+            };
+            try {
+                const res = await fetch('/api/partidos-abiertos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.status === 401) {
+                    cerrarModalCrearPartido();
+                    abrirModalAuth();
+                    return;
+                }
+                const data = await res.json();
+                if (data.success) {
+                    alert('¡Partido publicado con éxito en SportGrid!');
+                    cerrarModalCrearPartido();
+                    cargarPartidosAbiertos();
+                } else {
+                    alert(data.error || 'Error al publicar partido');
+                }
+            } catch (err) {
+                alert('Error al conectar con el servidor.');
+            }
+        }
+
+        async function cargarOfertasHome(ciudadFiltro = '') {
+            const container = document.getElementById('grilla-turnos-ofertas');
+            const sec = document.getElementById('turnos-oferta');
+            if (!container || !sec) return;
+            try {
+                const res = await fetch('/api/turnos-ofertas');
+                let ofertas = await res.json();
+                if (ciudadFiltro) {
+                    ofertas = ofertas.filter(of => {
+                        const ofC = normalizar(of.ciudad);
+                        return ofC.includes(ciudadFiltro) || ciudadFiltro.includes(ofC);
+                    });
+                }
+                if (!ofertas || ofertas.length === 0) {
+                    sec.style.display = 'none';
+                    return;
+                }
+                sec.style.display = 'block';
+                container.innerHTML = ofertas.map(of => `
+                    <div style="background: white; border: 1.5px solid #fecdd3; border-radius: 16px; padding: 20px; box-shadow: 0 4px 14px rgba(225,29,72,0.06); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="background: #ffe4e6; color: #e11d48; font-size: 0.75rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
+                                    ${of.nombre_deporte} · -${of.descuento_porc}% OFF
+                                </span>
+                                <span style="background: #fef2f2; color: #991b1b; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
+                                    ⏰ Hoy ${of.hora_inicio} hs
+                                </span>
+                            </div>
+                            <h4 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">
+                                ${of.nombre_club}
+                            </h4>
+                            <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">
+                                📍 ${of.nombre_cancha} · ${of.ciudad}
+                            </div>
+                            <p style="font-size: 0.82rem; color: #881337; line-height: 1.4; margin-bottom: 14px; background: #fff1f2; padding: 8px 12px; border-radius: 8px;">
+                                "${of.descripcion || 'Turno liberado a precio promocional'}"
+                            </p>
+                        </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+                                <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.88rem;">$${Number(of.precio_original).toLocaleString('es-AR')}</span>
+                                <span style="font-size: 1.35rem; font-weight: 900; color: #e11d48;">$${Number(of.precio_oferta).toLocaleString('es-AR')}</span>
+                            </div>
+                            <a href="/club/${of.id_club}?hora=${of.hora_inicio}" class="btn-buscar-capsule" style="background: #e11d48; width: 100%; justify-content: center; padding: 10px; font-size: 0.85rem; text-decoration: none;">
+                                <span>Aprovechar Oferta &rarr;</span>
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Error cargando ofertas:', e);
+                sec.style.display = 'none';
+            }
+        }
+
+        // Genera dinámicamente las fechas: Hoy, Mañana y todos los días de este mismo mes
+        document.addEventListener('DOMContentLoaded', () => {
+            poblarFechasDelMes();
+            cargarClubesDesdeServidor();
+            cargarPartidosAbiertos();
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('auth') === 'login') {
+                abrirModalAuth();
+            }
+        });
+
+        function poblarFechasDelMes() {
+            const select = document.getElementById('buscador-fecha');
+            if (!select) return;
+
+            const hoy = new Date();
+            const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const mesIndex = hoy.getMonth();
+            const ano = hoy.getFullYear();
+            const ultimoDiaMes = new Date(ano, mesIndex + 1, 0).getDate();
+            const diaActual = hoy.getDate();
+
+            select.innerHTML = '<option value="todas" selected>Cualquier fecha</option>';
+            for (let d = diaActual; d <= ultimoDiaMes; d++) {
+                const fecha = new Date(ano, mesIndex, d);
+                const diaStr = String(d).padStart(2, '0');
+                const mesStr = String(mesIndex + 1).padStart(2, '0');
+                const nombreDia = diasSemana[fecha.getDay()];
+
+                let texto = `${nombreDia} ${diaStr}/${mesStr}`;
+                if (d === diaActual) {
+                    texto = `Hoy ${diaStr}/${mesStr}`;
+                } else if (d === diaActual + 1) {
+                    texto = `Mañana ${diaStr}/${mesStr}`;
+                }
+
+                const opt = document.createElement('option');
+                opt.value = `${diaStr}/${mesStr}`;
+                opt.innerText = texto;
+                select.appendChild(opt);
+            }
+        }
+    
+        function seleccionarDeporteRapido(dep) {
+            const sel = document.getElementById('buscador-deporte');
+            if (sel) {
+                sel.value = dep;
+                ejecutarBusqueda(new Event('submit'));
+            }
+        }
     </script>
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR PARA CELULARES (PWA MOBILE) -->
+    <nav class="mobile-bottom-bar" aria-label="Navegación Móvil">
+        <a href="/#buscar" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>Buscar</span>
+        </a>
+        <a href="/mis-reservas" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Mis Turnos</span>
+        </a>
+        <a href="/software" class="bottom-bar-item destacado-software">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-7L10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path></svg>
+            <span>Para Clubes</span>
+        </a>
+        <a href="/admin" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Panel Club</span>
+        </a>
+        {% if current_user.logged_in %}
+        <a href="/mis-reservas" class="bottom-bar-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Mi Perfil</span>
+        </a>
+        {% else %}
+        <button type="button" class="bottom-bar-item" onclick="abrirModalAuth()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            <span>Ingresar</span>
+        </button>
+        {% endif %}
+    </nav>
+
 </body>
 </html>

@@ -1,0 +1,17 @@
+{
+  "name": "SportGrid - Red y Gestión Deportiva",
+  "short_name": "SportGrid",
+  "description": "Reservá canchas de pádel, fútbol y tenis en segundos en Argentina.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#005aff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
